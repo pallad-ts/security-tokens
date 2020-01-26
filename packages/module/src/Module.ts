@@ -6,6 +6,11 @@ import {PREDICATE} from "./securityTokenRuleAnnotation";
 import {SecurityTokenRule} from "@pallad/security-tokens/compiled";
 
 export class Module extends _Module<{ container: Container }> {
+
+    constructor(name: string) {
+        super('@pallad/security-tokens/module');
+    }
+
     init(): void {
         this.registerAction(StandardActions.INITIALIZATION, context => {
             context.container.definitionWithConstructor(References.SECURITY_TOKENS, SecurityTokens)
