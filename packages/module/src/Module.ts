@@ -7,7 +7,7 @@ import {SecurityTokenRule} from "@pallad/security-tokens/compiled";
 
 export class Module extends _Module<{ container: Container }> {
 
-    constructor(name: string) {
+    constructor() {
         super('@pallad/security-tokens/module');
     }
 
