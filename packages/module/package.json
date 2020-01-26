@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-module",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "",
   "main": "compiled/index.js",
   "types": "compiled/index.d.ts",
@@ -26,8 +26,8 @@
     "alpha-dic": "1.*"
   },
   "devDependencies": {
-    "@pallad/security-tokens": "*",
     "@pallad/modules": "*",
+    "@pallad/security-tokens": "^1.0.0",
     "alpha-dic": "1.*"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
