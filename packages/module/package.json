@@ -1,0 +1,35 @@
+{
+  "name": "@pallad/security-tokens-module",
+  "version": "0.0.0",
+  "description": "",
+  "main": "compiled/index.js",
+  "types": "compiled/index.d.ts",
+  "files": [
+    "compiled"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "../../node_modules/.bin/pallad-scripts test",
+    "lint": "../../node_modules/.bin/pallad-scripts lint",
+    "compile": "../../node_modules/.bin/pallad-scripts compile",
+    "prepare": "npm run compile",
+    "benchmark": "node ./benchmarks/verifier.js"
+  },
+  "peerDependencies": {
+    "@pallad/modules": "*",
+    "@pallad/security-tokens": "*",
+    "alpha-dic": "1.*"
+  },
+  "devDependencies": {
+    "@pallad/security-tokens": "*",
+    "@pallad/modules": "*",
+    "alpha-dic": "1.*"
+  },
+  "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
+  "license": "MIT"
+}

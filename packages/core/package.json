@@ -1,0 +1,35 @@
+{
+  "name": "@pallad/security-tokens",
+  "version": "0.0.0",
+  "description": "Abstraction over security tokens, sessions and participants",
+  "main": "compiled/index.js",
+  "types": "compiled/index.d.ts",
+  "files": [
+    "compiled"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "../../node_modules/.bin/pallad-scripts test",
+    "lint": "../../node_modules/.bin/pallad-scripts lint",
+    "compile": "../../node_modules/.bin/pallad-scripts compile",
+    "prepare": "npm run compile"
+  },
+  "keywords": [
+    "security",
+    "tokens",
+    "auth",
+    "participant"
+  ],
+  "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
+  "license": "MIT",
+  "dependencies": {
+    "alpha-errors": "^0.3.0",
+    "monet": "^0.9.1",
+    "tslib": "^1.10.0"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "@pallad/security-tokens-jwt",
+  "version": "0.0.0",
+  "description": "",
+  "main": "compiled/index.js",
+  "types": "compiled/index.d.ts",
+  "files": [
+    "compiled"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "../../node_modules/.bin/pallad-scripts test",
+    "lint": "../../node_modules/.bin/pallad-scripts lint",
+    "compile": "../../node_modules/.bin/pallad-scripts compile",
+    "prepare": "npm run compile",
+    "benchmark": "node ./benchmarks/verifier.js"
+  },
+  "peerDependencies": {
+    "@pallad/security-tokens": "*"
+  },
+  "devDependencies": {
+    "@pallad/security-tokens": "*"
+  },
+  "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
+  "license": "MIT",
+  "dependencies": {
+    "@pallad/secret": "^1.0.2",
+    "@types/jsonwebtoken": "^8.3.7",
+    "@types/lru-cache": "^5.1.0",
+    "alpha-errors": "^0.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "lru-cache": "^5.1.1",
+    "moment": "2.*",
+    "monet": "0.9.*",
+    "predicates": "^2.0.3",
+    "tslib": "^1.10.0"
+  }
+}

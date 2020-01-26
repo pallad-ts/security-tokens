@@ -1,0 +1,13 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "@pallad/scripts": "^1.1.4",
+    "@types/jest": "^24.9.1",
+    "@types/sinon": "^7.5.1",
+    "benchmark": "^2.1.4",
+    "jest-extended": "^0.11.4",
+    "lerna": "^3.18.4",
+    "sinon": "^7.5.0"
+  }
+}
