@@ -8,6 +8,7 @@
     "benchmark": "^2.1.4",
     "jest-extended": "^0.11.4",
     "lerna": "^3.18.4",
+    "node-mocks-http": "^1.8.1",
     "sinon": "^7.5.0"
   }
 }
