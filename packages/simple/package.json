@@ -1,6 +1,6 @@
 {
-  "name": "@pallad/security-token-simple",
-  "version": "1.0.0",
+  "name": "@pallad/security-tokens-simple",
+  "version": "0.0.0",
   "description": "",
   "main": "compiled/index.js",
   "types": "compiled/index.d.ts",
