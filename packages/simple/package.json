@@ -1,0 +1,30 @@
+{
+  "name": "@pallad/security-token-simple",
+  "version": "0.0.0",
+  "description": "",
+  "main": "compiled/index.js",
+  "types": "compiled/index.d.ts",
+  "files": [
+    "compiled"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "../../node_modules/.bin/pallad-scripts test",
+    "lint": "../../node_modules/.bin/pallad-scripts lint",
+    "compile": "../../node_modules/.bin/pallad-scripts compile",
+    "prepare": "npm run compile"
+  },
+  "peerDependencies": {
+    "@pallad/security-tokens": "*"
+  },
+  "devDependencies": {
+    "@pallad/security-tokens": "^1.0.0"
+  },
+  "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
+  "license": "MIT"
+}
