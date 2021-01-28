@@ -1,7 +1,7 @@
 import { Token } from '@pallad/security-tokens';
 
-export class TokenSimple<TValue = string, TPurpose extends string = string> extends Token {
-  constructor(readonly value: TValue, readonly purpose?: TPurpose) {
+export class TokenSimple<TType extends string = string, TValue = string> extends Token {
+  constructor(readonly value: TValue, readonly type: TType) {
     super();
     Object.freeze(this);
   }
