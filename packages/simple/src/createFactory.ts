@@ -7,7 +7,7 @@ export interface Factory<TType extends string, TValue> {
   is(value: any): value is TokenSimple<TType, TValue>;
 }
 
-export function createFactory<TType extends string = string, TValue = string>(type: TType) {
+export function createFactory<TValue = string, TType extends string = string>(type: TType) {
   const func: Factory<TType, TValue> = (value: TValue) => {
     return new TokenSimple(value, type);
   };

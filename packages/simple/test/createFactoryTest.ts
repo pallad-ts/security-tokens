@@ -30,4 +30,10 @@ describe('createFactory', () => {
     expect(factoryB.is(tokenB))
       .toBe(true);
   });
+
+  it('types for custom generics', () => {
+    const factory = createFactory<'bla'>('a');
+
+    assert<IsExact<Parameters<typeof factory>, ['bla']>>(true);
+  });
 });
