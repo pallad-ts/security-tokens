@@ -24,8 +24,8 @@ export class HAWKServerEngine {
 		);
 	}
 
-	async verifyWithPayload(request: HAWKServerEngine.Request, options?: HAWKServerEngine.Options) {
-		const payload = await this.getPayloadFromRequest(request);
+	async verifyWithPayload(request: HAWKServerEngine.Request, options?: HAWKServerEngine.Options.WithPayload) {
+		const payload = options?.payload ?? await this.getPayloadFromRequest(request);
 		const result = await this.internalVerify(request, {
 			...options,
 			payload
@@ -46,6 +46,12 @@ export class HAWKServerEngine {
 export namespace HAWKServerEngine {
 	export interface Options {
 		overrideHostHeader?: string;
+	}
+
+	export namespace Options {
+		export interface WithPayload extends Options {
+			payload?: Buffer;
+		}
 	}
 
 	export type Request = http.IncomingMessage;
