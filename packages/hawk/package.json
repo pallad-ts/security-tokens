@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-hawk",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "",
   "main": "compiled/index.js",
   "types": "compiled/index.d.ts",
@@ -22,9 +22,9 @@
   "license": "MIT",
   "dependencies": {
     "@pallad/secret": "^1.1.1",
+    "@pallad/security-tokens": "^1.0.1",
+    "@pallad/security-tokens-http": "^1.0.1",
     "alpha-errors": "^0.4.0",
-    "@pallad/security-tokens": "*",
-    "@pallad/security-tokens-http": "*",
     "hawk": "^9.0.1",
     "raw-body": "^2.5.1"
   },
