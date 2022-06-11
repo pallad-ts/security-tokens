@@ -14,11 +14,11 @@ export class HAWKServerEngine {
 	}
 
 	private internalVerify(request: http.IncomingMessage, options?: HAWKServerEngine.Options & { payload?: Buffer }) {
-		const {overrideHostHeader: hostHeaderName, payload} = options || {};
+		const {payload, ...restOptions} = options || {};
 		return server.authenticate(request,
 			this.credentialsStorage.retrieveCredentials.bind(this.credentialsStorage),
 			{
-				hostHeaderName,
+				...restOptions,
 				payload: payload as any
 			}
 		);
@@ -44,9 +44,7 @@ export class HAWKServerEngine {
 }
 
 export namespace HAWKServerEngine {
-	export interface Options {
-		overrideHostHeader?: string;
-	}
+	export type Options = Pick<server.AuthenticateOptions, 'port' | 'host' | 'hostHeaderName'>;
 
 	export namespace Options {
 		export interface WithPayload extends Options {
