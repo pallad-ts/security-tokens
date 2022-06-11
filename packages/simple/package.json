@@ -16,7 +16,8 @@
   "scripts": {
     "test": "../../node_modules/.bin/pallad-scripts test",
     "lint": "../../node_modules/.bin/pallad-scripts lint",
-    "compile": "../../node_modules/.bin/pallad-scripts compile"
+    "compile": "../../node_modules/.bin/pallad-scripts compile",
+    "prepack": "../../node_modules/.bin/pallad-scripts compile"
   },
   "peerDependencies": {
     "@pallad/security-tokens": "*"
