@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-jwt",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "compiled/index.js",
   "types": "compiled/index.d.ts",
@@ -24,7 +24,7 @@
     "@pallad/security-tokens": "*"
   },
   "devDependencies": {
-    "@pallad/security-tokens": "^1.0.1"
+    "@pallad/security-tokens": "^1.0.2"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
   "license": "MIT",
