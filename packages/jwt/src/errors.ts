@@ -1,7 +1,7 @@
-import {ErrorsDomain, generators} from "alpha-errors";
+import {Domain, generators} from "alpha-errors";
 import {SecurityTokenError} from "@pallad/security-tokens";
 
-export const errors = ErrorsDomain.create({
+export const errors = Domain.create({
     errorClass: SecurityTokenError,
     codeGenerator: generators.formatCode("E_JWT_%d")
 })

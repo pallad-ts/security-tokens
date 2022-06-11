@@ -17,7 +17,6 @@
     "test": "../../node_modules/.bin/pallad-scripts test",
     "lint": "../../node_modules/.bin/pallad-scripts lint",
     "compile": "../../node_modules/.bin/pallad-scripts compile",
-    "prepare": "npm run compile",
     "benchmark": "node ./benchmarks/verifier.js"
   },
   "peerDependencies": {
@@ -32,7 +31,7 @@
     "@pallad/secret": "^1.0.2",
     "@types/jsonwebtoken": "^8.3.7",
     "@types/lru-cache": "^5.1.0",
-    "alpha-errors": "^0.3.0",
+    "alpha-errors": "^0.4.0",
     "jsonwebtoken": "^8.5.1",
     "lru-cache": "^5.1.1",
     "moment": "2.*",

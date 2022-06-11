@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HAWKServerEngine verification with payload simple that fails 1`] = `
+Object {
+  "@@type": "monet.js/Either",
+  "isRightValue": false,
+  "value": [Error: Bad payload hash],
+}
+`;

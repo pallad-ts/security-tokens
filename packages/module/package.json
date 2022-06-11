@@ -17,7 +17,6 @@
     "test": "../../node_modules/.bin/pallad-scripts test",
     "lint": "../../node_modules/.bin/pallad-scripts lint",
     "compile": "../../node_modules/.bin/pallad-scripts compile",
-    "prepare": "npm run compile",
     "benchmark": "node ./benchmarks/verifier.js"
   },
   "peerDependencies": {

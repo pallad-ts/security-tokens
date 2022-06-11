@@ -57,7 +57,7 @@ export class JWTHelper {
             );
 
             return result;
-        } catch (e) {
+        } catch (e: any) {
             switch (true) {
                 case e.name === 'TokenExpiredError':
                     throw errors.EXPIRED();
