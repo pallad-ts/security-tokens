@@ -44,7 +44,11 @@ export class HAWKServerEngine {
 }
 
 export namespace HAWKServerEngine {
-	export type Options = Pick<server.AuthenticateOptions, 'port' | 'host' | 'hostHeaderName'>;
+	export interface Options {
+		hostHeaderName?: string;
+		host?: string;
+		port?: number;
+	};
 
 	export namespace Options {
 		export interface WithPayload extends Options {
