@@ -10,18 +10,26 @@ export class HAWKServerEngine {
 
 	async verifyWithoutPayload(request: HAWKServerEngine.Request, options?: HAWKServerEngine.Options) {
 		const result = await this.internalVerify(request, options);
-		return new TokenHAWK(result.credentials.user);
+		return new TokenHAWK(result.user);
 	}
 
-	private internalVerify(request: http.IncomingMessage, options?: HAWKServerEngine.Options & { payload?: Buffer }) {
-		const {payload, ...restOptions} = options || {};
-		return server.authenticate(request,
+	private async internalVerify(request: http.IncomingMessage, options?: HAWKServerEngine.Options & { payload?: Buffer }) {
+		const {payload, contentType, ...restOptions} = options || {};
+		const {credentials, artifacts} = await server.authenticate(request,
 			this.credentialsStorage.retrieveCredentials.bind(this.credentialsStorage),
-			{
-				...restOptions,
-				payload: payload as any
-			}
+			restOptions
 		);
+
+		if (payload) {
+			server.authenticatePayload(
+				payload as any,
+				credentials,
+				artifacts,
+				contentType ?? request.headers['content-type']!
+			);
+		}
+
+		return credentials;
 	}
 
 	async verifyWithPayload(request: HAWKServerEngine.Request, options?: HAWKServerEngine.Options.WithPayload) {
@@ -31,7 +39,7 @@ export class HAWKServerEngine {
 			payload
 		});
 
-		return new TokenHAWK(result.credentials.user);
+		return new TokenHAWK(result.user);
 	}
 
 	private async getPayloadFromRequest(request: HAWKServerEngine.Request) {
@@ -48,7 +56,8 @@ export namespace HAWKServerEngine {
 		hostHeaderName?: string;
 		host?: string;
 		port?: number;
-	};
+		contentType?: string;
+	}
 
 	export namespace Options {
 		export interface WithPayload extends Options {

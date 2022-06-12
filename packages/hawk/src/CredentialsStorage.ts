@@ -1,6 +1,5 @@
 import {Secret} from "@pallad/secret";
 import {server} from 'hawk';
-import {webcrypto} from 'node:crypto';
 import {errors} from "./errors";
 
 export class CredentialsStorage {
