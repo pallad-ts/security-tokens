@@ -31,10 +31,9 @@
   "dependencies": {
     "@pallad/secret": "^1.0.2",
     "@types/jsonwebtoken": "^8.3.7",
-    "@types/lru-cache": "^5.1.0",
     "alpha-errors": "^0.4.0",
     "jsonwebtoken": "^8.5.1",
-    "lru-cache": "^5.1.1",
+    "lru-cache": "^7",
     "moment": "2.*",
     "monet": "0.9.*",
     "predicates": "^2.0.3",
