@@ -12,7 +12,7 @@
     "lerna": "^4",
     "monet": "^0.9.3",
     "node-mocks-http": "^1.8.1",
-    "sinon": "^9",
+    "sinon": "^14",
     "undici": "^5.4.0"
   }
 }
