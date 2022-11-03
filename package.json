@@ -9,7 +9,7 @@
     "benchmark": "^2.1.4",
     "conditional-type-checks": "^1.0.5",
     "jest-extended": "^3",
-    "lerna": "^4",
+    "lerna": "^6",
     "node-mocks-http": "^1.8.1",
     "sinon": "^14",
     "undici": "^5.4.0"
