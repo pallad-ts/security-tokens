@@ -2,11 +2,11 @@ import {CachedVerifier} from "@src/CachedVerifier";
 import * as sinon from 'sinon';
 import {JWTHelper} from "@src/JWTHelper";
 import LRUCache = require("lru-cache");
-import {Either} from "monet";
 import {SecurityTokenError} from "@pallad/security-tokens";
 import {errors} from "@src/errors";
 import {secret} from "@pallad/secret";
 import * as moment from 'moment';
+import {Either, left, right} from "@sweet-monads/either";
 
 describe('CachedVerifier', () => {
 	let verifier: CachedVerifier;
@@ -67,11 +67,11 @@ describe('CachedVerifier', () => {
 
 			timer.tick(DURATION.asMilliseconds());
 
-			expect(await Either.fromPromise(verifier.verify(token)))
-				.toEqual(Either.Left(errors.EXPIRED()));
+			expect(await verifier.verify(token).then(right).catch(left))
+				.toEqual(left(errors.EXPIRED()));
 
-			expect(await Either.fromPromise(verifier.verify(token)))
-				.toEqual(Either.Left(errors.EXPIRED()));
+			expect(await verifier.verify(token).then(right).catch(left))
+				.toEqual(left(errors.EXPIRED()));
 
 			sinon.assert.calledTwice(spy);
 		});
@@ -83,11 +83,11 @@ describe('CachedVerifier', () => {
 
 			timer.tick(DURATION.asMilliseconds());
 
-			expect(await Either.fromPromise(verifier.verify(token)))
-				.toEqual(Either.Left(errors.EXPIRED()));
+			expect(await verifier.verify(token).then(right).catch(left))
+				.toEqual(left(errors.EXPIRED()));
 
-			expect(await Either.fromPromise(verifier.verify(token)))
-				.toEqual(Either.Left(errors.EXPIRED()));
+			expect(await verifier.verify(token).then(right).catch(left))
+				.toEqual(left(errors.EXPIRED()));
 
 			sinon.assert.calledOnce(spy);
 		});
@@ -99,11 +99,11 @@ describe('CachedVerifier', () => {
 
 			timer.tick(DURATION.asMilliseconds());
 
-			expect(await Either.fromPromise(verifier.verify(token)))
-				.toEqual(Either.Left(errors.EXPIRED()));
+			expect(await verifier.verify(token).then(right).catch(left))
+				.toEqual(left(errors.EXPIRED()));
 
-			expect(await Either.fromPromise(verifier.verify(token)))
-				.toEqual(Either.Left(errors.EXPIRED()));
+			expect(await verifier.verify(token).then(right).catch(left))
+				.toEqual(left(errors.EXPIRED()));
 
 			sinon.assert.calledTwice(spy);
 		});

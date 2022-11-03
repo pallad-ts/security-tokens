@@ -7,8 +7,7 @@ import {HAWKServerEngine} from "@src/HAWKServerEngine";
 import {TokenHAWK} from "@src/TokenHAWK";
 import {request} from 'undici';
 import {client} from 'hawk';
-import {Either} from "monet";
-
+import {Either, right, left} from '@sweet-monads/either';
 
 describe('HAWKServerEngine', () => {
 	let server: http.Server;
@@ -31,14 +30,14 @@ describe('HAWKServerEngine', () => {
 		engine = new HAWKServerEngine(credentialsStorage);
 	});
 
-	afterEach((done) => {
+	afterEach(done => {
 		server.close(done);
 	});
 
 	describe('verification with payload', () => {
 		it('simple', async () => {
 			let result: Promise<TokenHAWK> | undefined;
-			handler.callsFake(async (req, res) => {
+			handler.callsFake((req, res) => {
 				result = engine.verifyWithPayload(req);
 				res.end();
 			});
@@ -53,6 +52,7 @@ describe('HAWKServerEngine', () => {
 
 			await request(URL, {
 				method: 'POST',
+				// eslint-disable-next-line @typescript-eslint/naming-convention
 				headers: {Authorization: header, 'content-type': 'application/octet-stream'},
 				body: payload
 			});
@@ -67,9 +67,9 @@ describe('HAWKServerEngine', () => {
 
 		it('simple that fails', async () => {
 			let result: Promise<Either<unknown, unknown>> | undefined;
-			handler.callsFake(async (req, res) => {
+			handler.callsFake((req, res) => {
 				res.end();
-				result = Either.fromPromise(engine.verifyWithPayload(req));
+				result = engine.verifyWithPayload(req).then(right).catch(left);
 			});
 
 			const {header} = client.header(URL, 'POST', {
@@ -80,6 +80,7 @@ describe('HAWKServerEngine', () => {
 
 			await request(URL, {
 				method: 'POST',
+				// eslint-disable-next-line @typescript-eslint/naming-convention
 				headers: {Authorization: header, 'content-type': 'application/octet-stream'},
 				body: Buffer.from('completely different payload')
 			});

@@ -1,12 +1,13 @@
 import {JWTHelper} from "./JWTHelper";
 import LRUCache = require("lru-cache");
-import {Either} from "monet";
 import {SecurityTokenError} from "@pallad/security-tokens";
 import * as is from 'predicates';
+import {Either, right, left} from '@sweet-monads/either';
 
 function getCurrentTimestamp() {
 	return Math.floor(Date.now() / 1000);
 }
+
 
 export class CachedVerifier<T = any> {
 	constructor(private options: CachedVerifier.Options<T>) {
@@ -16,30 +17,31 @@ export class CachedVerifier<T = any> {
 	async verify(token: string): Promise<T> {
 		const cacheResult = this.options.cache.get(token, {allowStale: false});
 		if (cacheResult) {
-			return cacheResult.cata(e => {
-				throw e
-			}, x => x);
+			if (cacheResult.isLeft()) {
+				throw cacheResult.value;
+			}
+			return cacheResult.value;
 		}
 
-		const result = await Either.fromPromise<T, SecurityTokenError>(
-			this.options.helper.verify(token, this.options.verifyOptions)
-		);
+		const result = await this.options.helper.verify(token, this.options.verifyOptions)
+			.then(x => right(x as T))
+			.catch(left)
 
 		if (result.isRight()) {
 			const timestamp = getCurrentTimestamp();
-			const data = result.right() as any;
+			const data = result.value as any;
 			const age = data.exp - timestamp;
 			if (age > 0) {
 				this.options.cache.set(token, result, {ttl: age})
 			}
-			return result.right();
+			return result.value;
 		}
 
-		const shouldCacheError = this.isCacheableError(result.left());
+		const shouldCacheError = this.isCacheableError(result.value);
 		if (shouldCacheError) {
 			this.options.cache.set(token, result);
 		}
-		throw result.left();
+		throw result.value;
 	}
 
 	private isCacheableError(err: Error) {

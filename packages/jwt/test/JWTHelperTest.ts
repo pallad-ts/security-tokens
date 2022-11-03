@@ -4,7 +4,7 @@ import moment = require("moment");
 import {errors} from '@src/errors';
 import {secret} from "@pallad/secret";
 import {JWTHelper} from "@src/JWTHelper";
-import {Either} from "monet";
+import {Either, left, right} from '@sweet-monads/either';
 
 describe('JWTHelper', () => {
 	let tool: JWTHelper;
@@ -87,8 +87,8 @@ describe('JWTHelper', () => {
 
 		timer.tick(duration.asMilliseconds());
 
-		const invalidResult = await Either.fromPromise(tool.verify(token));
-		expect(invalidResult.left())
+		const invalidResult = await tool.verify(token).then(right).catch(left);
+		expect(invalidResult.value)
 			.toEqual(
 				new errors.EXPIRED()
 			);
@@ -100,11 +100,11 @@ describe('JWTHelper', () => {
 			notBefore: duration
 		});
 
-		const invalidResult = await Either.fromPromise(tool.verify(token));
+		const invalidResult = await tool.verify(token).then(right).catch(left);
 		timer.tick(duration.asMilliseconds());
 		const validResult = await tool.verify(token);
 
-		expect(invalidResult.left())
+		expect(invalidResult.value)
 			.toEqual(
 				new errors.NOT_VALID_BEFORE()
 			);
@@ -118,8 +118,8 @@ describe('JWTHelper', () => {
 	});
 
 	it('malformed token', async () => {
-		const result = await Either.fromPromise(tool.verify('malformedtoken'));
-		expect(result.left())
+		const result = await tool.verify('malformedtoken').then(right).catch(left);
+		expect(result.value)
 			.toEqual(
 				errors.MALFORMED()
 			);
@@ -134,9 +134,9 @@ describe('JWTHelper', () => {
 			subject: 'foo'
 		});
 
-		const invalidResult = await Either.fromPromise(tool.verify(token, {
+		const invalidResult = await tool.verify(token, {
 			subject: 'bar'
-		}));
+		}).then(right).catch(left);
 
 		expect(validResult)
 			.toEqual({
@@ -145,7 +145,7 @@ describe('JWTHelper', () => {
 				iat: 5
 			});
 
-		expect(invalidResult.left())
+		expect(invalidResult.value)
 			.toEqual(
 				errors.INVALID_SUBJECT()
 			);
@@ -157,9 +157,9 @@ describe('JWTHelper', () => {
 				expiresIn: 1000
 			});
 
-			const invalidResult = await Either.fromPromise(tool.verify(token));
+			const invalidResult = await tool.verify(token).then(right).catch(left);
 
-			expect(invalidResult.left())
+			expect(invalidResult.value)
 				.toEqual(errors.INVALID_KEY_ID());
 		});
 
@@ -172,8 +172,8 @@ describe('JWTHelper', () => {
 				k3: secret('some-secret')
 			});
 
-			const result = await Either.fromPromise(newTool.verify(token));
-			expect(result.left())
+			const result = await newTool.verify(token).then(right).catch(left);
+			expect(result.value)
 				.toEqual(
 					errors.INVALID_KEY_ID()
 				);

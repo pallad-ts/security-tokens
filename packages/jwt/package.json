@@ -24,7 +24,7 @@
     "@pallad/security-tokens": "*"
   },
   "devDependencies": {
-    "@pallad/security-tokens": "^1.0.3"
+    "@pallad/security-tokens": "*"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
   "license": "MIT",
@@ -35,9 +35,9 @@
     "jsonwebtoken": "^8.5.1",
     "lru-cache": "^7",
     "moment": "2.*",
-    "monet": "0.9.*",
     "predicates": "^2.0.3",
-    "tslib": "^1.10.0"
+    "@sweet-monads/either": "^3",
+    "tslib": "^2"
   },
   "gitHead": "b1063a16c0b97b1ee28e804039bfeff5f7e5fe1b"
 }
