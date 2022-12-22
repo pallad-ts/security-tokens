@@ -33,7 +33,7 @@
     "@sweet-monads/either": "^3",
     "@types/jsonwebtoken": "^8.3.7",
     "alpha-errors": "^0.4.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lru-cache": "^7",
     "moment": "2.*",
     "predicates": "^2.0.3",
