@@ -1,12 +1,8 @@
-import {ErrorsDomain, generators} from 'alpha-errors';
+import {Domain, formatCodeFactory, ErrorDescriptor} from '@pallad/errors';
 import {SecurityTokenError} from "./SecurityTokenError";
 
-export const errors = ErrorsDomain.create({
-    errorClass: SecurityTokenError,
-    codeGenerator: generators.formatCode('E_SC_%d')
-}).createErrors(create => {
-    return {
-        UNSUPPORTED_TOKEN: create('Security token is not supported'),
-        UNSUPPORTED_PARTICIPANT: create('Participant is not supported')
-    }
+const code = formatCodeFactory("E_SC_%c");
+export const errors = new Domain().addErrorsDescriptorsMap({
+	UNSUPPORTED_TOKEN: ErrorDescriptor.useDefaultMessage(code(1), 'Security token is not supported', SecurityTokenError),
+	UNSUPPORTED_PARTICIPANT: ErrorDescriptor.useDefaultMessage(code(2), 'Participant is not supported', SecurityTokenError)
 });
