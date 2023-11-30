@@ -8,7 +8,6 @@ function getCurrentTimestamp() {
 	return Math.floor(Date.now() / 1000);
 }
 
-
 export class CachedVerifier<T = any> {
 	constructor(private options: CachedVerifier.Options<T>) {
 

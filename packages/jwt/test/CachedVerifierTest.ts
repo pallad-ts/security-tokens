@@ -6,7 +6,7 @@ import {SecurityTokenError} from "@pallad/security-tokens";
 import {errors} from "@src/errors";
 import {secret} from "@pallad/secret";
 import * as moment from 'moment';
-import {Either, left, right} from "@sweet-monads/either";
+import {Either, fromPromise} from "@sweet-monads/either";
 
 describe('CachedVerifier', () => {
 	let verifier: CachedVerifier;
@@ -67,11 +67,14 @@ describe('CachedVerifier', () => {
 
 			timer.tick(DURATION.asMilliseconds());
 
-			expect(await verifier.verify(token).then(right).catch(left))
-				.toEqual(left(errors.EXPIRED()));
 
-			expect(await verifier.verify(token).then(right).catch(left))
-				.toEqual(left(errors.EXPIRED()));
+			const verifyResult1 = await fromPromise(verifier.verify(token));
+			expect(verifyResult1.isLeft()).toBe(true);
+			expect(verifyResult1.value).toBeErrorWithCode(errors.EXPIRED);
+
+			const verifyResult2 = await fromPromise(verifier.verify(token));
+			expect(verifyResult2.isLeft()).toBe(true);
+			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED);
 
 			sinon.assert.calledTwice(spy);
 		});
@@ -83,11 +86,13 @@ describe('CachedVerifier', () => {
 
 			timer.tick(DURATION.asMilliseconds());
 
-			expect(await verifier.verify(token).then(right).catch(left))
-				.toEqual(left(errors.EXPIRED()));
+			const verifyResult1 = await fromPromise(verifier.verify(token));
+			expect(verifyResult1.isLeft()).toBe(true);
+			expect(verifyResult1.value).toBeErrorWithCode(errors.EXPIRED)
 
-			expect(await verifier.verify(token).then(right).catch(left))
-				.toEqual(left(errors.EXPIRED()));
+			const verifyResult2 = await fromPromise(verifier.verify(token));
+			expect(verifyResult2.isLeft()).toBe(true);
+			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED)
 
 			sinon.assert.calledOnce(spy);
 		});
@@ -99,11 +104,13 @@ describe('CachedVerifier', () => {
 
 			timer.tick(DURATION.asMilliseconds());
 
-			expect(await verifier.verify(token).then(right).catch(left))
-				.toEqual(left(errors.EXPIRED()));
+			const verifyResult1 = await fromPromise(verifier.verify(token));
+			expect(verifyResult1.isLeft()).toBe(true);
+			expect(verifyResult1.value).toBeErrorWithCode(errors.EXPIRED);
 
-			expect(await verifier.verify(token).then(right).catch(left))
-				.toEqual(left(errors.EXPIRED()));
+			const verifyResult2 = await fromPromise(verifier.verify(token));
+			expect(verifyResult2.isLeft()).toBe(true);
+			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED);
 
 			sinon.assert.calledTwice(spy);
 		});

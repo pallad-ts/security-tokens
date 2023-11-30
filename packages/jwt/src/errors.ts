@@ -1,16 +1,11 @@
-import {Domain, generators} from "alpha-errors";
+import {Domain, ErrorDescriptor, formatCodeFactory} from "@pallad/errors";
 import {SecurityTokenError} from "@pallad/security-tokens";
 
-export const errors = Domain.create({
-    errorClass: SecurityTokenError,
-    codeGenerator: generators.formatCode("E_JWT_%d")
-})
-    .createErrors(create => {
-        return {
-            EXPIRED: create('Token expired'),
-            NOT_VALID_BEFORE: create('Token is not valid yet'),
-            MALFORMED: create('Malformed'),
-            INVALID_SUBJECT: create('Invalid subject'),
-            INVALID_KEY_ID: create('Invalid key id')
-        }
-    });
+const code = formatCodeFactory("E_JWT_%c");
+export const errors = new Domain().addErrorsDescriptorsMap({
+	EXPIRED: ErrorDescriptor.useDefaultMessage(code(1), 'Token expired', SecurityTokenError),
+	NOT_VALID_BEFORE: ErrorDescriptor.useDefaultMessage(code(2), 'Token is not valid yet', SecurityTokenError),
+	MALFORMED: ErrorDescriptor.useDefaultMessage(code(3), 'Malformed', SecurityTokenError),
+	INVALID_SUBJECT: ErrorDescriptor.useDefaultMessage(code(4), 'Invalid subject', SecurityTokenError),
+	INVALID_KEY_ID: ErrorDescriptor.useDefaultMessage(code(5), 'Invalid key id', SecurityTokenError)
+});

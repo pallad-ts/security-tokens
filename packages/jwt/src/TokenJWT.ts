@@ -1,9 +1,9 @@
 import {Token} from "@pallad/security-tokens";
 
 export class TokenJWT extends Token {
-    constructor(readonly payload: string) {
-        super();
+	constructor(readonly payload: string) {
+		super();
 
-        Object.freeze(this);
-    }
+		Object.freeze(this);
+	}
 }

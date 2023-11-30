@@ -4,7 +4,7 @@ import moment = require("moment");
 import {errors} from '@src/errors';
 import {secret} from "@pallad/secret";
 import {JWTHelper} from "@src/JWTHelper";
-import {Either, left, right} from '@sweet-monads/either';
+import {left, right, fromPromise} from '@sweet-monads/either';
 
 describe('JWTHelper', () => {
 	let tool: JWTHelper;
@@ -87,11 +87,9 @@ describe('JWTHelper', () => {
 
 		timer.tick(duration.asMilliseconds());
 
-		const invalidResult = await tool.verify(token).then(right).catch(left);
-		expect(invalidResult.value)
-			.toEqual(
-				new errors.EXPIRED()
-			);
+		const invalidResult = await fromPromise(tool.verify(token));
+		expect(invalidResult.isLeft()).toBe(true);
+		expect(invalidResult.value).toBeErrorWithCode(errors.EXPIRED);
 	});
 
 	it('not before', async () => {
@@ -100,14 +98,13 @@ describe('JWTHelper', () => {
 			notBefore: duration
 		});
 
-		const invalidResult = await tool.verify(token).then(right).catch(left);
+		const invalidResult = await fromPromise(tool.verify(token));
 		timer.tick(duration.asMilliseconds());
 		const validResult = await tool.verify(token);
 
+		expect(invalidResult.isLeft()).toBe(true);
 		expect(invalidResult.value)
-			.toEqual(
-				new errors.NOT_VALID_BEFORE()
-			);
+			.toBeErrorWithCode(errors.NOT_VALID_BEFORE);
 
 		expect(validResult)
 			.toEqual({
@@ -118,11 +115,9 @@ describe('JWTHelper', () => {
 	});
 
 	it('malformed token', async () => {
-		const result = await tool.verify('malformedtoken').then(right).catch(left);
-		expect(result.value)
-			.toEqual(
-				errors.MALFORMED()
-			);
+		const result = await fromPromise(tool.verify('malformedtoken'));
+		expect(result.isLeft()).toBe(true);
+		expect(result.value).toBeErrorWithCode(errors.MALFORMED);
 	});
 
 	it('invalid subject', async () => {
@@ -134,9 +129,9 @@ describe('JWTHelper', () => {
 			subject: 'foo'
 		});
 
-		const invalidResult = await tool.verify(token, {
+		const invalidResult = await fromPromise(tool.verify(token, {
 			subject: 'bar'
-		}).then(right).catch(left);
+		}));
 
 		expect(validResult)
 			.toEqual({
@@ -145,10 +140,8 @@ describe('JWTHelper', () => {
 				iat: 5
 			});
 
-		expect(invalidResult.value)
-			.toEqual(
-				errors.INVALID_SUBJECT()
-			);
+		expect(invalidResult.isLeft()).toBe(true);
+		expect(invalidResult.value).toBeErrorWithCode(errors.INVALID_SUBJECT);
 	});
 
 	describe('invalid key', () => {
@@ -157,10 +150,11 @@ describe('JWTHelper', () => {
 				expiresIn: 1000
 			});
 
-			const invalidResult = await tool.verify(token).then(right).catch(left);
-
-			expect(invalidResult.value)
-				.toEqual(errors.INVALID_KEY_ID());
+			const invalidResult = await fromPromise(tool.verify(token));
+			expect(invalidResult.isLeft()).toBe(true);
+			expect(invalidResult.value).toBeErrorWithCode(
+				errors.INVALID_KEY_ID
+			);
 		});
 
 		it('key that does not exist', async () => {
@@ -172,11 +166,11 @@ describe('JWTHelper', () => {
 				k3: secret('some-secret')
 			});
 
-			const result = await newTool.verify(token).then(right).catch(left);
-			expect(result.value)
-				.toEqual(
-					errors.INVALID_KEY_ID()
-				);
+			const result = await fromPromise(newTool.verify(token));
+			expect(result.isLeft()).toBe(true);
+			expect(result.value).toBeErrorWithCode(
+				errors.INVALID_KEY_ID
+			);
 		});
 	});
 });
