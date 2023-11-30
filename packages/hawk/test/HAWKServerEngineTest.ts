@@ -1,13 +1,13 @@
 import * as http from "http";
 import {json} from 'body-parser';
 import * as sinon from 'sinon';
-import {CredentialsStorage} from "@src/CredentialsStorage";
 import {secret} from "@pallad/secret";
 import {HAWKServerEngine} from "@src/HAWKServerEngine";
 import {TokenHAWK} from "@src/TokenHAWK";
 import {request} from 'undici';
 import {client} from 'hawk';
 import {Either, right, left} from '@sweet-monads/either';
+import {createStaticCredentialsLoader} from "@src/createStaticCredentialsLoader";
 
 describe('HAWKServerEngine', () => {
 	let server: http.Server;
@@ -15,9 +15,16 @@ describe('HAWKServerEngine', () => {
 	let engine: HAWKServerEngine;
 	const URL = `http://localhost:10000/some-path`;
 
-	const credentialsStorage = new CredentialsStorage('sha256');
-	credentialsStorage.registerCredential('1', secret('k1'), 'u1');
-	credentialsStorage.registerCredential('2', secret('k2'), 'u2');
+	const credentialsLoader = createStaticCredentialsLoader('sha256', {
+		c1: {
+			key: secret('k1'),
+			user: 'u1'
+		},
+		c2: {
+			key: secret('k2'),
+			user: 'u2'
+		}
+	})
 
 	beforeEach(() => {
 		handler = sinon.stub();
@@ -27,7 +34,7 @@ describe('HAWKServerEngine', () => {
 			});
 		});
 		server.listen(10000);
-		engine = new HAWKServerEngine(credentialsStorage);
+		engine = new HAWKServerEngine(credentialsLoader);
 	});
 
 	afterEach(done => {
@@ -47,7 +54,7 @@ describe('HAWKServerEngine', () => {
 			const {header} = client.header(URL, 'POST', {
 				contentType: 'application/octet-stream',
 				payload: payload as any,
-				credentials: {id: '1', ...credentialsStorage.retrieveCredentials('1')}
+				credentials: {id: 'c1', ...(await credentialsLoader('c1'))!}
 			});
 
 			await request(URL, {
@@ -75,7 +82,7 @@ describe('HAWKServerEngine', () => {
 			const {header} = client.header(URL, 'POST', {
 				contentType: 'application/octet-stream',
 				payload: Buffer.from('somepayloaddata', 'utf-8') as any,
-				credentials: {id: '1', ...credentialsStorage.retrieveCredentials('1')}
+				credentials: {id: 'c1', ...(await credentialsLoader('c1'))!}
 			});
 
 			await request(URL, {

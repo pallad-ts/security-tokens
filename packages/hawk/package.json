@@ -14,10 +14,11 @@
     "access": "public"
   },
   "scripts": {
-    "test": "../../node_modules/.bin/pallad-scripts test",
-    "lint": "../../node_modules/.bin/pallad-scripts lint",
-    "compile": "../../node_modules/.bin/pallad-scripts compile",
-    "prepack": "../../node_modules/.bin/pallad-scripts compile"
+    "test": "npx pallad-scripts test",
+    "lint": "npx pallad-scripts lint",
+    "generate-barrels": "npx barrelsby -l all --delete -d ./src",
+    "compile": "npm run generate-barrels && npx pallad-scripts compile",
+    "prepack": "npx pallad-scripts compile"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
   "license": "MIT",
@@ -25,6 +26,7 @@
     "@pallad/secret": "^1.1.1",
     "@pallad/security-tokens": "^1.1.0",
     "@pallad/security-tokens-http": "^1.1.0",
+    "@pallad/errors": "^1",
     "alpha-errors": "^0.4.0",
     "hawk": "^9.0.1",
     "raw-body": "^2.5.1"

@@ -1,11 +1,22 @@
 import * as http from "http";
 import {server} from 'hawk';
-import {CredentialsStorage} from "./CredentialsStorage";
+import {CredentialsLoader} from "./CredentialsLoader";
 import {TokenHAWK} from "./TokenHAWK";
 import getRawBody = require("raw-body");
+import {errors} from "./errors";
 
 export class HAWKServerEngine {
-	constructor(private credentialsStorage: CredentialsStorage) {
+
+	private finalCredentialsLoader = async (id: string) => {
+		const credentials = await this.credentialsLoader(id);
+		if (credentials === undefined) {
+			throw errors.NO_CREDENTIALS_FOUND.create(id);
+		}
+		return credentials;
+	}
+
+	constructor(private credentialsLoader: CredentialsLoader) {
+
 	}
 
 	async verifyWithoutPayload(request: HAWKServerEngine.Request, options?: HAWKServerEngine.Options) {
@@ -16,7 +27,7 @@ export class HAWKServerEngine {
 	private async internalVerify(request: http.IncomingMessage, options?: HAWKServerEngine.Options & { payload?: Buffer }) {
 		const {payload, contentType, ...restOptions} = options || {};
 		const {credentials, artifacts} = await server.authenticate(request,
-			this.credentialsStorage.retrieveCredentials.bind(this.credentialsStorage),
+			this.finalCredentialsLoader,
 			restOptions
 		);
 
