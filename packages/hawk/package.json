@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-hawk",
-  "version": "1.4.2",
+  "version": "1.3.0",
   "description": "",
   "main": "compiled/index.js",
   "types": "compiled/index.d.ts",
