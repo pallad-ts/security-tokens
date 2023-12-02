@@ -14,9 +14,9 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "../../node_modules/.bin/pallad-scripts lint",
-    "compile": "../../node_modules/.bin/pallad-scripts compile",
-    "prepack": "../../node_modules/.bin/pallad-scripts compile"
+    "lint": "npx pallad-scripts lint",
+    "compile": "npx pallad-scripts compile",
+    "prepublishOnly": "npx pallad-scripts compile"
   },
   "peerDependencies": {
     "@pallad/security-tokens": "*"

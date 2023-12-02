@@ -14,10 +14,10 @@
     "access": "public"
   },
   "scripts": {
-    "test": "../../node_modules/.bin/pallad-scripts test",
-    "lint": "../../node_modules/.bin/pallad-scripts lint",
-    "compile": "../../node_modules/.bin/pallad-scripts compile",
-    "prepack": "../../node_modules/.bin/pallad-scripts compile"
+    "test": "npx pallad-scripts test",
+    "lint": "npx pallad-scripts lint",
+    "compile": "npx pallad-scripts compile",
+    "prepublishOnly": "npm run compile"
   },
   "peerDependencies": {
     "@pallad/security-tokens": "*"

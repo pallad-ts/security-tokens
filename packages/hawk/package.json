@@ -18,7 +18,7 @@
     "lint": "npx pallad-scripts lint",
     "generate-barrels": "npx barrelsby -l all --delete -d ./src",
     "compile": "npm run generate-barrels && npx pallad-scripts compile",
-    "prepack": "npx pallad-scripts compile"
+    "prepublishOnly": "npx pallad-scripts compile"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
   "license": "MIT",
