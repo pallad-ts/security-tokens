@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Abstraction over security tokens, sessions and participants",
   "main": "compiled/index.js",
   "types": "compiled/index.d.ts",
