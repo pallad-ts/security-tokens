@@ -15,9 +15,7 @@
   },
   "scripts": {
     "lint": "../../node_modules/.bin/pallad-scripts lint",
-    "compile": "../../node_modules/.bin/pallad-scripts compile",
-    "benchmark": "node ./benchmarks/verifier.js",
-    "prepack": "../../node_modules/.bin/pallad-scripts compile"
+    "compile": "../../node_modules/.bin/pallad-scripts compile"
   },
   "peerDependencies": {
     "@pallad/modules": "*",
@@ -30,5 +28,6 @@
     "alpha-dic": "1.*"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
-  "license": "MIT"
+  "license": "MIT",
+  "gitHead": "344460311d3c794e74cf25c05808e68ddbdd92b4"
 }
