@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@pallad/modules": "*",
-    "@pallad/security-tokens": "^1.2.1",
+    "@pallad/security-tokens": "^1",
     "alpha-dic": "1.*"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
