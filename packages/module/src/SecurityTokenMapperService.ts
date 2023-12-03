@@ -1,10 +1,10 @@
 import {Annotation, Service} from "alpha-dic";
-import {securityTokenRuleAnnotation} from "./securityTokenRuleAnnotation";
+import {securityTokenMapperAnnotation} from "./securityTokenMapperAnnotation";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export function SecurityTokenRuleService() {
+export function SecurityTokenMapperService() {
 	return function (clazz: { new(...args: any[]): any }) {
 		Service()(clazz);
-		Annotation(securityTokenRuleAnnotation())(clazz);
+		Annotation(securityTokenMapperAnnotation())(clazz);
 	}
 }

@@ -1,30 +1,45 @@
-import {SecurityTokenRule} from "./SecurityTokenRule";
-import {Token} from "./Token";
 import {errors} from "./errors";
+import {SecurityTokenToPrincipalMapper} from "./SecurityTokenToPrincipalMapper";
+import {Token} from "./Token";
 
-export class SecurityTokens {
-	private rules: Set<SecurityTokenRule> = new Set();
+export class SecurityTokens<T> {
+	#rules: Set<SecurityTokenToPrincipalMapper<T>> = new Set();
+	#defaultPrincipal?: T;
 
-	addRule(rule: SecurityTokenRule): this {
-		this.rules.add(rule);
+	addMapper(rule: SecurityTokenToPrincipalMapper<T>): this {
+		this.#rules.add(rule);
 		return this;
 	}
 
-	async toToken(participant: any): Promise<Token> {
-		for (const rule of this.rules) {
-			if (rule.supportsParticipant(participant)) {
-				return rule.toToken(participant);
-			}
-		}
-		throw errors.UNSUPPORTED_PARTICIPANT.create();
+	useDefaultPrincipal(defaultPrincipal: T): this {
+		this.#defaultPrincipal = defaultPrincipal;
+		return this;
 	}
 
-	toParticipant(token: any): Promise<any> {
-		for (const rule of this.rules) {
-			if (rule.supportsToken(token)) {
-				return rule.toParticipant(token);
+	async toPrincipal(token: Token): Promise<T> {
+		for (const mapper of this.#rules) {
+			const result = await mapper(token);
+			if (result.isJust()) {
+				return result.unwrap();
 			}
 		}
+
+		if (this.#defaultPrincipal) {
+			return this.#defaultPrincipal;
+		}
 		throw errors.UNSUPPORTED_TOKEN.create();
+	}
+
+	createObtainPrincipal() {
+		let called = false;
+		let result: Promise<T> | undefined;
+		return async (token: Token) => {
+			if (called) {
+				return result!;
+			}
+			called = true;
+			result = this.toPrincipal(token);
+			return result;
+		};
 	}
 }

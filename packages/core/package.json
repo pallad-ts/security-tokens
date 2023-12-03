@@ -28,8 +28,7 @@
   "license": "MIT",
   "dependencies": {
     "@pallad/errors": "^1",
-    "@pallad/type-check": "^1.2.0",
-    "tslib": "^1.10.0"
+    "@pallad/type-check": "^1.2.0"
   },
   "gitHead": "344460311d3c794e74cf25c05808e68ddbdd92b4"
 }
