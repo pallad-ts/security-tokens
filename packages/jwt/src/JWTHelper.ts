@@ -7,7 +7,6 @@ import {errors} from "./errors";
 export class JWTHelper {
 	constructor(private algorithm: Algorithm,
 				private privateKeys: Record<string, Secret<string>>) {
-
 	}
 
 	sign<T>(data: T, options: JWTHelper.SignOptions = {}): Promise<string> {
@@ -56,7 +55,6 @@ export class JWTHelper {
 					complete: false
 				}
 			);
-
 			return result;
 		} catch (e: any) {
 			switch (true) {
