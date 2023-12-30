@@ -1,5 +1,5 @@
 import {Secret} from "@pallad/secret";
-import {Algorithm, sign, SignOptions, verify, VerifyOptions} from "jsonwebtoken";
+import {Algorithm, JwtPayload, sign, SignOptions, verify, VerifyOptions} from "jsonwebtoken";
 import {promisify} from "util";
 import * as moment from "moment";
 import {errors} from "./errors";
@@ -45,14 +45,15 @@ export class JWTHelper {
 		return [key, this.privateKeys[key].getValue()];
 	}
 
-	async verify<T>(token: string, options: JWTHelper.VerifyOptions = {}): Promise<T> {
+	async verify<T extends JwtPayload>(token: string, options: JWTHelper.VerifyOptions = {}): Promise<T> {
 		try {
 			const result = await promisify<string, any, VerifyOptions, T>(verify)(
 				token,
 				this.getPrivateKeyForHeader.bind(this),
 				{
 					algorithms: [this.algorithm],
-					subject: options.subject
+					subject: options.subject,
+					complete: false
 				}
 			);
 
