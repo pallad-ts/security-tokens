@@ -33,7 +33,7 @@
     "@pallad/errors": "^1",
     "@pallad/secret": "^1.0.2",
     "@sweet-monads/either": "^3",
-    "@types/jsonwebtoken": "^8.3.7",
+    "@types/jsonwebtoken": "^9",
     "jsonwebtoken": "^9",
     "lru-cache": "^7",
     "moment": "2.*",
