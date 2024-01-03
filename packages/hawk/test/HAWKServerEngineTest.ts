@@ -37,8 +37,8 @@ describe('HAWKServerEngine', () => {
 		engine = new HAWKServerEngine(credentialsLoader);
 	});
 
-	afterEach(done => {
-		server.close(done);
+	afterEach(() => {
+		server.close();
 	});
 
 	describe('verification with payload', () => {
