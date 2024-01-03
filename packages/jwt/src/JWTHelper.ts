@@ -14,6 +14,10 @@ export class JWTHelper {
 		this.#keyRing = keyRing;
 	}
 
+	get algorithm() {
+		return this.#algorithm;
+	}
+
 	sign<T>(data: T, options: JWTHelper.SignOptions = {}): Promise<string> {
 		const key = this.#getKeyIdOrRandom(options.keyid);
 
