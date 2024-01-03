@@ -1,8 +1,9 @@
-import {Algorithm, JwtPayload, sign, SignOptions, SignOptions as _SignOptions, verify, VerifyOptions as _VerifyOptions} from "jsonwebtoken";
+import {Algorithm, Jwt, JwtPayload, sign, SignOptions, SignOptions as _SignOptions, verify, VerifyOptions as _VerifyOptions} from "jsonwebtoken";
 import {promisify} from "util";
 import {errors} from "./errors";
 import {KeyRing} from "@pallad/keyring";
 import {Duration} from 'luxon';
+import {JWT} from "./JWT";
 
 export class JWTHelper {
 	#keyRing: KeyRing;
@@ -49,18 +50,17 @@ export class JWTHelper {
 		return this.#keyRing.assertEntryById(keyId);
 	}
 
-	async verify<T extends JwtPayload>(token: string, options: JWTHelper.VerifyOptions = {}): Promise<T> {
+	async verify<T extends JwtPayload>(token: string, options: JWTHelper.VerifyOptions = {}) {
 		try {
-			const result = await promisify<string, any, _VerifyOptions, T>(verify)(
+			return await promisify<string, any, _VerifyOptions, JWT<T>>(verify)(
 				token,
 				this.getPrivateKeyForHeader.bind(this),
 				{
 					...options,
 					algorithms: [this.#algorithm],
-					complete: false
+					complete: true
 				}
 			);
-			return result;
 		} catch (e: any) {
 			switch (true) {
 				case e.name === 'TokenExpiredError':

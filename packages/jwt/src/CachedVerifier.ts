@@ -4,6 +4,7 @@ import {SecurityTokenError} from "@pallad/security-tokens";
 import * as is from 'predicates';
 import {Either, fromPromise} from '@sweet-monads/either';
 import {JwtPayload} from "jsonwebtoken";
+import {JWT} from "./JWT";
 
 function getCurrentTimestamp() {
 	return Math.floor(Date.now() / 1000);
@@ -14,7 +15,7 @@ export class CachedVerifier<T extends JwtPayload = any> {
 
 	}
 
-	async verify(token: string): Promise<T> {
+	async verify(token: string): Promise<JWT<T>> {
 		const cacheResult = this.options.cache.get(token, {allowStale: false});
 		if (cacheResult) {
 			if (cacheResult.isLeft()) {
@@ -23,7 +24,7 @@ export class CachedVerifier<T extends JwtPayload = any> {
 			return cacheResult.value;
 		}
 
-		const result = await fromPromise<SecurityTokenError, T>(
+		const result = await fromPromise<SecurityTokenError, JWT<T>>(
 			this.options.helper.verify<T>(token, this.options.verifyOptions)
 		)
 
@@ -57,9 +58,9 @@ export class CachedVerifier<T extends JwtPayload = any> {
 }
 
 export namespace CachedVerifier {
-	export interface Options<T> {
+	export interface Options<T extends JwtPayload> {
 		helper: JWTHelper;
-		cache: LRUCache<string, Either<SecurityTokenError, T>>;
+		cache: LRUCache<string, Either<SecurityTokenError, JWT<T>>>;
 		verifyOptions: JWTHelper.VerifyOptions,
 		options?: {
 			cacheError?: boolean | ((err: Error) => boolean)

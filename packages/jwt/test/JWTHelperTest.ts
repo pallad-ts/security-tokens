@@ -41,7 +41,7 @@ describe('JWTHelper', () => {
 		const token = await tool.sign(DATA);
 		const newData = await tool.verify(token);
 
-		expect(newData)
+		expect(newData.payload)
 			.toEqual({
 				...DATA,
 				iat: 5
@@ -82,7 +82,7 @@ describe('JWTHelper', () => {
 		});
 
 		expect(await tool.verify(token))
-			.toEqual({
+			.toHaveProperty('payload', {
 				...DATA,
 				iat: 5,
 				exp: 605
@@ -109,7 +109,7 @@ describe('JWTHelper', () => {
 		expect(invalidResult.value)
 			.toBeErrorWithCode(errors.NOT_VALID_BEFORE);
 
-		expect(validResult)
+		expect(validResult.payload)
 			.toEqual({
 				...DATA,
 				iat: 5,
@@ -136,7 +136,7 @@ describe('JWTHelper', () => {
 			subject: 'bar'
 		}));
 
-		expect(validResult)
+		expect(validResult.payload)
 			.toEqual({
 				...DATA,
 				sub: 'foo',
