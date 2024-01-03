@@ -2,13 +2,14 @@ import {JWTHelper} from "./JWTHelper";
 import LRUCache = require("lru-cache");
 import {SecurityTokenError} from "@pallad/security-tokens";
 import * as is from 'predicates';
-import {Either, right, left} from '@sweet-monads/either';
+import {Either, fromPromise} from '@sweet-monads/either';
+import {JwtPayload} from "jsonwebtoken";
 
 function getCurrentTimestamp() {
 	return Math.floor(Date.now() / 1000);
 }
 
-export class CachedVerifier<T = any> {
+export class CachedVerifier<T extends JwtPayload = any> {
 	constructor(private options: CachedVerifier.Options<T>) {
 
 	}
@@ -22,9 +23,10 @@ export class CachedVerifier<T = any> {
 			return cacheResult.value;
 		}
 
-		const result = await this.options.helper.verify(token, this.options.verifyOptions)
-			.then(x => right(x as T))
-			.catch(left)
+		const result = await fromPromise<SecurityTokenError, T>(
+			this.options.helper.verify<T>(token, this.options.verifyOptions)
+		)
+
 
 		if (result.isRight()) {
 			const timestamp = getCurrentTimestamp();

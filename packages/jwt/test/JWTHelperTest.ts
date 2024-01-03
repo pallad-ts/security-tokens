@@ -1,15 +1,18 @@
 import * as sinon from 'sinon';
 import {decode as _decode, sign as _sign} from 'jsonwebtoken';
-import moment = require("moment");
 import {errors} from '@src/errors';
 import {secret} from "@pallad/secret";
 import {JWTHelper} from "@src/JWTHelper";
-import {left, right, fromPromise} from '@sweet-monads/either';
+
+import {fromPromise} from '@sweet-monads/either';
+import {Duration} from 'luxon';
+import {KeyRing} from "@pallad/keyring";
 
 describe('JWTHelper', () => {
 	let tool: JWTHelper;
 
 	let timer: sinon.SinonFakeTimers;
+	let keyRing: KeyRing;
 
 	const ALGORITHM = 'HS512';
 	const DATA = {
@@ -22,10 +25,10 @@ describe('JWTHelper', () => {
 	}
 
 	beforeEach(() => {
-		tool = new JWTHelper(ALGORITHM, {
-			k1: secret('rrJLFNm7FvelkhYrqWP7P08cJMX0IvcMLgkINt9wAEJZnMnGwt3sP6ZozotO'),
-			k2: secret('uphSbURwF2Xqtfa3OWwIX9b34NCz3jWc9CTDKZaomewnTotYswoVe1Ci5pyL')
-		});
+		keyRing = new KeyRing()
+			.addKey('k1', secret('rrJLFNm7FvelkhYrqWP7P08cJMX0IvcMLgkINt9wAEJZnMnGwt3sP6ZozotO'))
+			.addKey('k2', secret('uphSbURwF2Xqtfa3OWwIX9b34NCz3jWc9CTDKZaomewnTotYswoVe1Ci5pyL'))
+		tool = new JWTHelper(ALGORITHM, keyRing);
 
 		timer = sinon.useFakeTimers(5000);
 	});
@@ -48,8 +51,8 @@ describe('JWTHelper', () => {
 	it('signing', async () => {
 		const token = await tool.sign(DATA, {
 			subject: 'access-token',
-			id: '100',
-			expires: moment.duration(2, 'seconds')
+			jwtid: '100',
+			expiresIn: Duration.fromDurationLike({seconds: 2})
 		});
 
 		const decoded = decode(token);
@@ -73,9 +76,9 @@ describe('JWTHelper', () => {
 	});
 
 	it('expiration', async () => {
-		const duration = moment.duration(10, 'minutes');
+		const duration = Duration.fromObject({minutes: 10});
 		const token = await tool.sign(DATA, {
-			expires: duration
+			expiresIn: duration
 		});
 
 		expect(await tool.verify(token))
@@ -85,7 +88,7 @@ describe('JWTHelper', () => {
 				exp: 605
 			});
 
-		timer.tick(duration.asMilliseconds());
+		timer.tick(duration.as('milliseconds'));
 
 		const invalidResult = await fromPromise(tool.verify(token));
 		expect(invalidResult.isLeft()).toBe(true);
@@ -93,13 +96,13 @@ describe('JWTHelper', () => {
 	});
 
 	it('not before', async () => {
-		const duration = moment.duration(10, 'minutes');
+		const duration = Duration.fromObject({minutes: 10});
 		const token = await tool.sign(DATA, {
 			notBefore: duration
 		});
 
 		const invalidResult = await fromPromise(tool.verify(token));
-		timer.tick(duration.asMilliseconds());
+		timer.tick(duration.as('milliseconds'));
 		const validResult = await tool.verify(token);
 
 		expect(invalidResult.isLeft()).toBe(true);
@@ -159,12 +162,12 @@ describe('JWTHelper', () => {
 
 		it('key that does not exist', async () => {
 			const token = await tool.sign(DATA, {
-				expires: moment.duration(10, 'seconds')
+				expiresIn: Duration.fromObject({seconds: 10})
 			});
 
-			const newTool = new JWTHelper(ALGORITHM, {
-				k3: secret('some-secret')
-			});
+			const newKeyRing = new KeyRing()
+				.addKey('k3', secret('some-secret'))
+			const newTool = new JWTHelper(ALGORITHM, newKeyRing);
 
 			const result = await fromPromise(newTool.verify(token));
 			expect(result.isLeft()).toBe(true);

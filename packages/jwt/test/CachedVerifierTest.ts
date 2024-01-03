@@ -5,8 +5,9 @@ import LRUCache = require("lru-cache");
 import {SecurityTokenError} from "@pallad/security-tokens";
 import {errors} from "@src/errors";
 import {secret} from "@pallad/secret";
-import * as moment from 'moment';
 import {Either, fromPromise} from "@sweet-monads/either";
+import {Duration} from "luxon";
+import {KeyRing} from "@pallad/keyring";
 
 describe('CachedVerifier', () => {
 	let verifier: CachedVerifier;
@@ -19,7 +20,7 @@ describe('CachedVerifier', () => {
 		subject: 'any'
 	};
 	const CURRENT_TIMESTAMP = 60;
-	const DURATION = moment.duration(100, 'seconds');
+	const DURATION = Duration.fromObject({seconds: 100});
 
 	function createVerifier(options?: CachedVerifier.Options<any>['options']) {
 		return new CachedVerifier({
@@ -37,15 +38,18 @@ describe('CachedVerifier', () => {
 		};
 	}
 
-	function createToken(expires: moment.Duration) {
+	function createToken(expiresIn: Duration) {
 		return helper.sign({foo: 'bar'}, {
 			subject: 'any',
-			expires
+			expiresIn
 		});
 	}
 
 	beforeEach(() => {
-		helper = new JWTHelper('HS512', {k1: secret('testPrivateKey')});
+		const keyRing = new KeyRing()
+			.addKey('k1', secret('testPrivateKey'));
+
+		helper = new JWTHelper('HS512', keyRing);
 		cache = new LRUCache({
 			max: 10000,
 			ttl: 10000,
@@ -63,9 +67,9 @@ describe('CachedVerifier', () => {
 	describe('error result', () => {
 		it('by default not cached', async () => {
 			const spy = sinon.spy(helper, 'verify');
-			const token = await createToken(moment.duration(100, 'seconds'));
+			const token = await createToken(Duration.fromObject({seconds: 100}));
 
-			timer.tick(DURATION.asMilliseconds());
+			timer.tick(DURATION.as('milliseconds'));
 
 
 			const verifyResult1 = await fromPromise(verifier.verify(token));
@@ -82,9 +86,9 @@ describe('CachedVerifier', () => {
 		it('error cache enabled', async () => {
 			const verifier = createVerifier({cacheError: true});
 			const spy = sinon.spy(helper, 'verify');
-			const token = await createToken(moment.duration(100, 'seconds'));
+			const token = await createToken(Duration.fromObject({seconds: 100}));
 
-			timer.tick(DURATION.asMilliseconds());
+			timer.tick(DURATION.as('milliseconds'));
 
 			const verifyResult1 = await fromPromise(verifier.verify(token));
 			expect(verifyResult1.isLeft()).toBe(true);
@@ -95,14 +99,15 @@ describe('CachedVerifier', () => {
 			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED)
 
 			sinon.assert.calledOnce(spy);
-		});
+		})
+		;
 
 		it('error cache disabled', async () => {
 			const verifier = createVerifier({cacheError: false});
 			const spy = sinon.spy(helper, 'verify');
-			const token = await createToken(moment.duration(100, 'seconds'));
+			const token = await createToken(Duration.fromObject({seconds: 100}));
 
-			timer.tick(DURATION.asMilliseconds());
+			timer.tick(DURATION.as('milliseconds'));
 
 			const verifyResult1 = await fromPromise(verifier.verify(token));
 			expect(verifyResult1.isLeft()).toBe(true);

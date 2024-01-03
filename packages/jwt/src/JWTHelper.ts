@@ -1,57 +1,58 @@
-import {Secret} from "@pallad/secret";
-import {Algorithm, JwtPayload, sign, SignOptions, verify, VerifyOptions} from "jsonwebtoken";
+import {Algorithm, JwtPayload, sign, SignOptions, SignOptions as _SignOptions, verify, VerifyOptions as _VerifyOptions} from "jsonwebtoken";
 import {promisify} from "util";
-import * as moment from "moment";
 import {errors} from "./errors";
+import {KeyRing} from "@pallad/keyring";
+import {Duration} from 'luxon';
 
 export class JWTHelper {
-	constructor(private algorithm: Algorithm,
-				private privateKeys: Record<string, Secret<string>>) {
+	#keyRing: KeyRing;
+	#algorithm: Algorithm;
+
+	constructor(algorithm: Algorithm,
+				keyRing: KeyRing) {
+		this.#algorithm = algorithm;
+		this.#keyRing = keyRing;
 	}
 
 	sign<T>(data: T, options: JWTHelper.SignOptions = {}): Promise<string> {
-		const [keyId, privateKey] = this.getRandomKey();
-		const signOptions: SignOptions = {
-			algorithm: this.algorithm,
-			keyid: keyId,
+		const key = this.#getKeyIdOrRandom(options.keyid);
+
+		const {expiresIn, notBefore, ...restOptions} = options;
+		const signOptions: _SignOptions = {
+			...restOptions,
+			algorithm: this.#algorithm,
+			keyid: key.id
+
 		};
 
-		if (options.id) {
-			signOptions.jwtid = options.id;
+		if (options.expiresIn) {
+			signOptions.expiresIn = options.expiresIn.as('seconds');
 		}
-
-		if (options.subject) {
-			signOptions.subject = options.subject;
-		}
-
-		if (options.expires) {
-			signOptions.expiresIn = options.expires.asSeconds()
-		}
-
 		if (options.notBefore) {
-			signOptions.notBefore = options.notBefore.asSeconds()
+			signOptions.notBefore = options.notBefore.as('seconds');
 		}
 
 		return promisify<any, string, SignOptions, string>(sign)({
 			...data,
-		}, privateKey, signOptions);
+		}, key.key.getValue(), signOptions);
 	}
 
-	private getRandomKey(): [string, string] {
-		const keys = Object.keys(this.privateKeys);
-		const key = keys[Math.floor(Math.random() * keys.length)];
+	#getKeyIdOrRandom(keyId?: string) {
+		if (!keyId) {
+			return this.#keyRing.getRandomKey();
+		}
 
-		return [key, this.privateKeys[key].getValue()];
+		return this.#keyRing.assertEntryById(keyId);
 	}
 
 	async verify<T extends JwtPayload>(token: string, options: JWTHelper.VerifyOptions = {}): Promise<T> {
 		try {
-			const result = await promisify<string, any, VerifyOptions, T>(verify)(
+			const result = await promisify<string, any, _VerifyOptions, T>(verify)(
 				token,
 				this.getPrivateKeyForHeader.bind(this),
 				{
-					algorithms: [this.algorithm],
-					subject: options.subject,
+					...options,
+					algorithms: [this.#algorithm],
 					complete: false
 				}
 			);
@@ -83,7 +84,7 @@ export class JWTHelper {
 			return;
 		}
 
-		const privateKey = this.privateKeys[header.kid];
+		const privateKey = this.#keyRing.getKeyById(header.kid);
 		if (!privateKey) {
 			callback(errors.INVALID_KEY_ID.create());
 			return;
@@ -94,14 +95,10 @@ export class JWTHelper {
 }
 
 export namespace JWTHelper {
-	export interface SignOptions {
-		expires?: moment.Duration;
-		notBefore?: moment.Duration;
-		id?: string;
-		subject?: string;
+	export interface SignOptions extends Omit<_SignOptions, 'expiresIn' | 'notBefore' | 'algorithm'> {
+		expiresIn?: Duration;
+		notBefore?: Duration;
 	}
 
-	export interface VerifyOptions {
-		subject?: string;
-	}
+	export type VerifyOptions = Omit<_VerifyOptions, 'algorithms'>;
 }
