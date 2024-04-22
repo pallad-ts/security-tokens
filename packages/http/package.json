@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-http",
-  "version": "1.1.6",
+  "version": "3.0.0",
   "description": "",
   "main": "dist/pallad-security-tokens-http.cjs.js",
   "types": "dist/pallad-security-tokens-http.cjs.d.ts",
@@ -25,7 +25,7 @@
     "@pallad/security-tokens": "*"
   },
   "devDependencies": {
-    "@pallad/security-tokens": "^2.0.1"
+    "@pallad/security-tokens": "^3.0.0"
   },
   "author": "Łukasz Kużyński <lukasz.kuzynski@gmail.com> (http://wookieb.pl)",
   "license": "MIT",

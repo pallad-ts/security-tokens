@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Abstraction over security tokens, sessions and participants",
   "main": "dist/pallad-security-tokens.cjs.js",
   "types": "dist/pallad-security-tokens.cjs.d.ts",

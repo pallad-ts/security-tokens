@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-hawk",
-  "version": "1.5.2",
+  "version": "3.0.0",
   "description": "",
   "main": "dist/pallad-security-tokens-hawk.cjs.js",
   "types": "dist/pallad-security-tokens-hawk.cjs.d.ts",
@@ -26,8 +26,8 @@
   "dependencies": {
     "@pallad/errors": "^1",
     "@pallad/secret": "^1.1.1",
-    "@pallad/security-tokens": "^2.0.1",
-    "@pallad/security-tokens-http": "^1.1.6",
+    "@pallad/security-tokens": "^3.0.0",
+    "@pallad/security-tokens-http": "^3.0.0",
     "alpha-errors": "^0.4.0",
     "hawk": "^9.0.1",
     "raw-body": "^2.5.1"
