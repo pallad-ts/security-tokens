@@ -2,10 +2,10 @@
   "name": "@pallad/security-tokens-jwt",
   "version": "2.1.0",
   "description": "",
-  "main": "compiled/index.js",
-  "types": "compiled/index.d.ts",
+  "main": "dist/pallad-security-tokens-jwt.cjs.js",
+  "types": "dist/pallad-security-tokens-jwt.cjs.d.ts",
   "files": [
-    "compiled"
+    "dist"
   ],
   "directories": {
     "test": "test"
@@ -15,10 +15,12 @@
   },
   "scripts": {
     "test": "npx pallad-scripts test",
+    "generate-barrels": "npx barrelsby -l all --delete -d ./src",
+    "compile": "npm run generate-barrels && npx preconstruct build",
     "lint": "npx pallad-scripts lint",
-    "compile": "npx pallad-scripts compile",
+    "prepublishOnly": "npm run compile",
     "benchmark": "node ./benchmarks/verifier.js",
-    "prepublishOnly": "npm run compile"
+    "setup-dev": "npx preconstruct dev"
   },
   "peerDependencies": {
     "@pallad/security-tokens": "*"

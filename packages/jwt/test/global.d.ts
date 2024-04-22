@@ -1,2 +1,3 @@
-import 'jest-extended';
-import '@pallad/errors-dev'
+import "jest-extended";
+
+import "@pallad/errors-dev";

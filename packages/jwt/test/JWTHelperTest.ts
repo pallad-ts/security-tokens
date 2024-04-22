@@ -1,33 +1,33 @@
-import * as sinon from 'sinon';
-import {decode as _decode, sign as _sign} from 'jsonwebtoken';
-import {errors} from '@src/errors';
-import {secret} from "@pallad/secret";
-import {JWTHelper} from "@src/JWTHelper";
+import { JWTHelper } from "@src/JWTHelper";
+import { errors } from "@src/errors";
+import { fromPromise } from "@sweet-monads/either";
+import { decode as _decode, sign as _sign } from "jsonwebtoken";
+import { Duration } from "luxon";
+import * as sinon from "sinon";
 
-import {fromPromise} from '@sweet-monads/either';
-import {Duration} from 'luxon';
-import {KeyRing} from "@pallad/keyring";
+import { KeyRing } from "@pallad/keyring";
+import { secret } from "@pallad/secret";
 
-describe('JWTHelper', () => {
+describe("JWTHelper", () => {
 	let tool: JWTHelper;
 
 	let timer: sinon.SinonFakeTimers;
 	let keyRing: KeyRing;
 
-	const ALGORITHM = 'HS512';
+	const ALGORITHM = "HS512";
 	const DATA = {
-		some: 'data',
-		to: 'sign'
+		some: "data",
+		to: "sign",
 	};
 
 	function decode(token: string): any {
-		return _decode(token, {complete: true});
+		return _decode(token, { complete: true });
 	}
 
 	beforeEach(() => {
 		keyRing = new KeyRing()
-			.addKey('k1', secret('rrJLFNm7FvelkhYrqWP7P08cJMX0IvcMLgkINt9wAEJZnMnGwt3sP6ZozotO'))
-			.addKey('k2', secret('uphSbURwF2Xqtfa3OWwIX9b34NCz3jWc9CTDKZaomewnTotYswoVe1Ci5pyL'))
+			.addKey("k1", secret("rrJLFNm7FvelkhYrqWP7P08cJMX0IvcMLgkINt9wAEJZnMnGwt3sP6ZozotO"))
+			.addKey("k2", secret("uphSbURwF2Xqtfa3OWwIX9b34NCz3jWc9CTDKZaomewnTotYswoVe1Ci5pyL"));
 		tool = new JWTHelper(ALGORITHM, keyRing);
 
 		timer = sinon.useFakeTimers(5000);
@@ -37,143 +37,134 @@ describe('JWTHelper', () => {
 		timer.restore();
 	});
 
-	it('sanity check', async () => {
+	it("sanity check", async () => {
 		const token = await tool.sign(DATA);
 		const newData = await tool.verify(token);
 
-		expect(newData.payload)
-			.toEqual({
-				...DATA,
-				iat: 5
-			});
+		expect(newData.payload).toEqual({
+			...DATA,
+			iat: 5,
+		});
 	});
 
-	it('signing', async () => {
+	it("signing", async () => {
 		const token = await tool.sign(DATA, {
-			subject: 'access-token',
-			jwtid: '100',
-			expiresIn: Duration.fromDurationLike({seconds: 2})
+			subject: "access-token",
+			jwtid: "100",
+			expiresIn: Duration.fromDurationLike({ seconds: 2 }),
 		});
 
 		const decoded = decode(token);
 
-		expect(decoded)
-			.toMatchObject({
-				header: {
-					alg: ALGORITHM,
-					typ: 'JWT',
-					kid: expect.toBeOneOf(['k1', 'k2'])
-				},
-				payload: {
-					...DATA,
-					iat: 5,
-					exp: 7,
-					sub: 'access-token',
-					jti: '100'
-				},
-				signature: expect.toBeString()
-			});
-	});
-
-	it('expiration', async () => {
-		const duration = Duration.fromObject({minutes: 10});
-		const token = await tool.sign(DATA, {
-			expiresIn: duration
-		});
-
-		expect(await tool.verify(token))
-			.toHaveProperty('payload', {
+		expect(decoded).toMatchObject({
+			header: {
+				alg: ALGORITHM,
+				typ: "JWT",
+				kid: expect.toBeOneOf(["k1", "k2"]),
+			},
+			payload: {
 				...DATA,
 				iat: 5,
-				exp: 605
-			});
+				exp: 7,
+				sub: "access-token",
+				jti: "100",
+			},
+			signature: expect.toBeString(),
+		});
+	});
 
-		timer.tick(duration.as('milliseconds'));
+	it("expiration", async () => {
+		const duration = Duration.fromObject({ minutes: 10 });
+		const token = await tool.sign(DATA, {
+			expiresIn: duration,
+		});
+
+		expect(await tool.verify(token)).toHaveProperty("payload", {
+			...DATA,
+			iat: 5,
+			exp: 605,
+		});
+
+		timer.tick(duration.as("milliseconds"));
 
 		const invalidResult = await fromPromise(tool.verify(token));
 		expect(invalidResult.isLeft()).toBe(true);
 		expect(invalidResult.value).toBeErrorWithCode(errors.EXPIRED);
 	});
 
-	it('not before', async () => {
-		const duration = Duration.fromObject({minutes: 10});
+	it("not before", async () => {
+		const duration = Duration.fromObject({ minutes: 10 });
 		const token = await tool.sign(DATA, {
-			notBefore: duration
+			notBefore: duration,
 		});
 
 		const invalidResult = await fromPromise(tool.verify(token));
-		timer.tick(duration.as('milliseconds'));
+		timer.tick(duration.as("milliseconds"));
 		const validResult = await tool.verify(token);
 
 		expect(invalidResult.isLeft()).toBe(true);
-		expect(invalidResult.value)
-			.toBeErrorWithCode(errors.NOT_VALID_BEFORE);
+		expect(invalidResult.value).toBeErrorWithCode(errors.NOT_VALID_BEFORE);
 
-		expect(validResult.payload)
-			.toEqual({
-				...DATA,
-				iat: 5,
-				nbf: 605
-			});
+		expect(validResult.payload).toEqual({
+			...DATA,
+			iat: 5,
+			nbf: 605,
+		});
 	});
 
-	it('malformed token', async () => {
-		const result = await fromPromise(tool.verify('malformedtoken'));
+	it("malformed token", async () => {
+		const result = await fromPromise(tool.verify("malformedtoken"));
 		expect(result.isLeft()).toBe(true);
 		expect(result.value).toBeErrorWithCode(errors.MALFORMED);
 	});
 
-	it('invalid subject', async () => {
+	it("invalid subject", async () => {
 		const token = await tool.sign(DATA, {
-			subject: 'foo'
+			subject: "foo",
 		});
 
 		const validResult = await tool.verify(token, {
-			subject: 'foo'
+			subject: "foo",
 		});
 
-		const invalidResult = await fromPromise(tool.verify(token, {
-			subject: 'bar'
-		}));
+		const invalidResult = await fromPromise(
+			tool.verify(token, {
+				subject: "bar",
+			})
+		);
 
-		expect(validResult.payload)
-			.toEqual({
-				...DATA,
-				sub: 'foo',
-				iat: 5
-			});
+		expect(validResult.payload).toEqual({
+			...DATA,
+			sub: "foo",
+			iat: 5,
+		});
 
 		expect(invalidResult.isLeft()).toBe(true);
 		expect(invalidResult.value).toBeErrorWithCode(errors.INVALID_SUBJECT);
 	});
 
-	describe('invalid key', () => {
-		it('missing key', async () => {
-			const token = _sign(DATA, 'private-key', {
-				expiresIn: 1000
+	describe("invalid key", () => {
+		it("missing key", async () => {
+			const token = _sign(DATA, "private-key", {
+				expiresIn: 1000,
 			});
 
 			const invalidResult = await fromPromise(tool.verify(token));
 			expect(invalidResult.isLeft()).toBe(true);
-			expect(invalidResult.value).toBeErrorWithCode(
-				errors.INVALID_KEY_ID
-			);
+			expect(invalidResult.value).toBeErrorWithCode(errors.INVALID_KEY_ID);
 		});
 
-		it('key that does not exist', async () => {
+		it("key that does not exist", async () => {
 			const token = await tool.sign(DATA, {
-				expiresIn: Duration.fromObject({seconds: 10})
+				expiresIn: Duration.fromObject({ seconds: 10 }),
 			});
 
-			const newKeyRing = new KeyRing()
-				.addKey('k3', secret('some-secret'))
+			const newKeyRing = new KeyRing().addKey("k3", secret("some-secret"));
 			const newTool = new JWTHelper(ALGORITHM, newKeyRing);
 
 			const result = await fromPromise(newTool.verify(token));
 			expect(result.isLeft()).toBe(true);
-			expect(result.value).toBeErrorWithCode(
-				errors.INVALID_KEY_ID
-			);
+			expect(result.value).toBeErrorWithCode(errors.INVALID_KEY_ID);
 		});
 	});
 });

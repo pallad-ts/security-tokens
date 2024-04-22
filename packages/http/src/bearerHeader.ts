@@ -1,10 +1,14 @@
-import {TokenFactory} from "./TokenFactory";
-import {Token} from "@pallad/security-tokens";
+import { Token } from "@pallad/security-tokens";
 
-export function bearerHeader(factory: (x: string) => Token, userOpts: bearerHeader.Options.FromUser = {}): TokenFactory.Rule {
+import { TokenFactory } from "./TokenFactory";
+
+export function bearerHeader(
+	factory: (x: string) => Token,
+	userOpts: bearerHeader.Options.FromUser = {}
+): TokenFactory.Rule {
 	const options = {
 		...bearerHeader.Options.DEFAULT,
-		...userOpts
+		...userOpts,
 	};
 
 	return request => {
@@ -21,12 +25,12 @@ export function bearerHeader(factory: (x: string) => Token, userOpts: bearerHead
 			const value = header.slice(options.prefix.length);
 			return factory(value);
 		}
-	}
+	};
 }
 
 export namespace bearerHeader {
 	export interface Options {
-		prefix: string,
+		prefix: string;
 		header: string;
 	}
 
@@ -34,8 +38,8 @@ export namespace bearerHeader {
 		export type FromUser = Partial<Options>;
 
 		export const DEFAULT = {
-			prefix: 'Bearer ',
-			header: 'authorization'
+			prefix: "Bearer ",
+			header: "authorization",
 		};
 	}
 }

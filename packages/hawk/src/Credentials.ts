@@ -1,6 +1,6 @@
-import {Secret} from "@pallad/secret";
+import { Secret } from "@pallad/secret";
 
 export interface Credentials {
-	key: Secret<string>,
+	key: Secret<string>;
 	user: string;
 }

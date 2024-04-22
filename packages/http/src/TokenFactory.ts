@@ -1,5 +1,6 @@
-import * as http from 'http';
-import {Token} from "@pallad/security-tokens";
+import * as http from "http";
+
+import { Token } from "@pallad/security-tokens";
 
 export class TokenFactory {
 	private rules = new Set<TokenFactory.Rule>();

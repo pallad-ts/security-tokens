@@ -1,9 +1,9 @@
 export class SecurityTokenError extends Error {
-    readonly code!: string;
+	readonly code!: string;
 
-    constructor(message: string) {
-        super(message);
-        this.name = 'SecurityTokenError';
-        this.message = message;
-    }
+	constructor(message: string) {
+		super(message);
+		this.name = "SecurityTokenError";
+		this.message = message;
+	}
 }

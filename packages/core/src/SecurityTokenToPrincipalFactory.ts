@@ -1,13 +1,13 @@
-import {errors} from "./errors";
-import {SecurityTokenToPrincipalMapper} from "./SecurityTokenToPrincipalMapper";
-import {Token} from "./Token";
+import { SecurityTokenToPrincipalMapper } from "./SecurityTokenToPrincipalMapper";
+import { Token } from "./Token";
+import { errors } from "./errors";
 
-export class SecurityTokens<T> {
-	#rules: Set<SecurityTokenToPrincipalMapper<T>> = new Set();
+export class SecurityTokenToPrincipalFactory<T> {
+	#mapperList: Set<SecurityTokenToPrincipalMapper<T>> = new Set();
 	#defaultPrincipal?: T;
 
-	addMapper(rule: SecurityTokenToPrincipalMapper<T>): this {
-		this.#rules.add(rule);
+	addMapper(mapper: SecurityTokenToPrincipalMapper<T>): this {
+		this.#mapperList.add(mapper);
 		return this;
 	}
 
@@ -17,7 +17,7 @@ export class SecurityTokens<T> {
 	}
 
 	async toPrincipal(token: Token): Promise<T> {
-		for (const mapper of this.#rules) {
+		for (const mapper of this.#mapperList) {
 			const result = await mapper(token);
 			if (result.isJust()) {
 				return result.unwrap();

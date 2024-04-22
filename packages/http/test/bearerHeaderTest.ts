@@ -1,51 +1,46 @@
-import {createRequest} from 'node-mocks-http';
-import {bearerHeader} from "@src/bearerHeader";
-import {SimpleToken} from "./SimpleToken";
+import { bearerHeader } from "@src/bearerHeader";
+import { createRequest } from "node-mocks-http";
 
-describe('bearerHeader', () => {
-    const VALUE = 'SomePayload';
+import { SimpleToken } from "./SimpleToken";
 
-    describe('prefix', () => {
-        it('be default uses "Bearer"', () => {
-            const request = createRequest({
-                headers: {
-                    authorization: `Bearer ${VALUE}`
-                }
-            });
+describe("bearerHeader", () => {
+	const VALUE = "SomePayload";
 
-            expect(bearerHeader(SimpleToken.factory)(request))
-                .toStrictEqual(
-                    new SimpleToken(VALUE)
-                );
-        });
+	describe("prefix", () => {
+		it('be default uses "Bearer"', () => {
+			const request = createRequest({
+				headers: {
+					authorization: `Bearer ${VALUE}`,
+				},
+			});
 
-        it('ignores value is does not start with given prefix', () => {
-            const request = createRequest({
-                headers: {
-                    authorization: `test ${VALUE}`
-                }
-            });
+			expect(bearerHeader(SimpleToken.factory)(request)).toStrictEqual(new SimpleToken(VALUE));
+		});
 
-            expect(bearerHeader(SimpleToken.factory)(request))
-                .toBeUndefined()
-        })
-    });
+		it("ignores value is does not start with given prefix", () => {
+			const request = createRequest({
+				headers: {
+					authorization: `test ${VALUE}`,
+				},
+			});
 
-    it('returns nothing if header does not exist', () => {
-        const request = createRequest();
+			expect(bearerHeader(SimpleToken.factory)(request)).toBeUndefined();
+		});
+	});
 
-        expect(bearerHeader(SimpleToken.factory)(request))
-            .toBeUndefined();
-    });
+	it("returns nothing if header does not exist", () => {
+		const request = createRequest();
 
-    it('returns nothing if header contains multiple values', () => {
-        const request = createRequest({
-            headers: {
-                test: [VALUE, 'foo']
-            }
-        });
+		expect(bearerHeader(SimpleToken.factory)(request)).toBeUndefined();
+	});
 
-        expect(bearerHeader(SimpleToken.factory, {header: 'test'})(request))
-            .toBeUndefined();
-    });
+	it("returns nothing if header contains multiple values", () => {
+		const request = createRequest({
+			headers: {
+				test: [VALUE, "foo"],
+			},
+		});
+
+		expect(bearerHeader(SimpleToken.factory, { header: "test" })(request)).toBeUndefined();
+	});
 });

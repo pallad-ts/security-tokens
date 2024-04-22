@@ -1,12 +1,14 @@
-import {Token} from "@pallad/security-tokens";
-import {TokenFactory} from "./TokenFactory";
+import { Token } from "@pallad/security-tokens";
+
+import { TokenFactory } from "./TokenFactory";
 
 export function cookie(factory: (x: string) => Token, cookieName: string): TokenFactory.Rule {
 	return (request: TokenFactory.Request & { cookies?: any }) => {
-
-		if (!('cookies' in request)) {
+		if (!("cookies" in request)) {
 			// eslint-disable-next-line no-console
-			console.warn('Request contains no "cookies" property. Make sure you have used a cookie-parser middleware first.');
+			console.warn(
+				'Request contains no "cookies" property. Make sure you have used a cookie-parser middleware first.'
+			);
 			return;
 		}
 
@@ -14,5 +16,5 @@ export function cookie(factory: (x: string) => Token, cookieName: string): Token
 		if (cookie) {
 			return factory(cookie);
 		}
-	}
+	};
 }

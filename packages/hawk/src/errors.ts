@@ -1,5 +1,5 @@
-import {SecurityTokenError} from "@pallad/security-tokens";
-import {Domain, ErrorDescriptor, formatCodeFactory} from "@pallad/errors";
+import { Domain, ErrorDescriptor, formatCodeFactory } from "@pallad/errors";
+import { SecurityTokenError } from "@pallad/security-tokens";
 
 const code = formatCodeFactory("E_HAWK_%c");
 export const errors = new Domain().addErrorsDescriptorsMap({
@@ -7,5 +7,5 @@ export const errors = new Domain().addErrorsDescriptorsMap({
 		code(1),
 		(credentialId: string) => `Credential for ID: ${credentialId} not found`,
 		SecurityTokenError
-	)
-})
+	),
+});

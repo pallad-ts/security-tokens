@@ -1,7 +1,10 @@
-import {Token} from "./Token";
+import { Token } from "./Token";
 
 export class TokenSimple<TType extends string = string, TValue = string> extends Token {
-	constructor(readonly value: TValue, readonly type: TType) {
+	constructor(
+		readonly value: TValue,
+		readonly type: TType
+	) {
 		super();
 		Object.freeze(this);
 	}
@@ -24,5 +27,4 @@ export namespace TokenSimple {
 
 		is(value: any): value is TokenSimple<TType, TValue>;
 	}
-
 }
