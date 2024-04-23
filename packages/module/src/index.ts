@@ -3,6 +3,8 @@
  */
 
 export * from "./Module";
+export * from "./PrincipalToSecurityTokenMapperShape";
 export * from "./References";
+export * from "./SecurityTokenToPrincipalMapperShape";
 export * from "./principalToSecurityTokenMapperAnnotation";
 export * from "./securityTokenToPrincipalMapperAnnotation";
