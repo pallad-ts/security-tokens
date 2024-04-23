@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-module",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "",
   "main": "dist/pallad-security-tokens-module.cjs.js",
   "types": "dist/pallad-security-tokens-module.cjs.d.ts",
