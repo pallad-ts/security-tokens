@@ -2,14 +2,13 @@ import { CachedVerifier } from "@src/CachedVerifier";
 import { JWTHelper } from "@src/JWTHelper";
 import { errors } from "@src/errors";
 import { Either, fromPromise } from "@sweet-monads/either";
+import { LRUCache } from "lru-cache";
 import { Duration } from "luxon";
 import * as sinon from "sinon";
 
 import { KeyRing } from "@pallad/keyring";
 import { secret } from "@pallad/secret";
 import { SecurityTokenError } from "@pallad/security-tokens";
-
-import LRUCache = require("lru-cache");
 
 describe("CachedVerifier", () => {
 	let verifier: CachedVerifier;

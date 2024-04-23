@@ -1,7 +1,7 @@
 import { Either, fromPromise } from "@sweet-monads/either";
 import { JwtPayload } from "jsonwebtoken";
 // eslint-disable-next-line @typescript-eslint/naming-convention
-import LRUCache from "lru-cache";
+import { LRUCache } from "lru-cache";
 import * as is from "predicates";
 
 import { SecurityTokenError } from "@pallad/security-tokens";
