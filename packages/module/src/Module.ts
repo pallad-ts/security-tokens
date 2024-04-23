@@ -1,12 +1,11 @@
 import { Container, Definition, onActivation } from "@pallad/container";
 import { Module as _Module, StandardActions } from "@pallad/modules";
-import {
-	SecurityTokenToPrincipalMapper,
-	SecurityTokenToPrincipalFactory,
-	PrincipalToSecurityTokenFactory,
-} from "@pallad/security-tokens";
+import { SecurityTokenToPrincipalFactory, PrincipalToSecurityTokenFactory } from "@pallad/security-tokens";
 
+import { PrincipalToSecurityTokenMapperShape } from "./PrincipalToSecurityTokenMapperShape";
 import { References } from "./References";
+import { SecurityTokenToPrincipalMapperShape } from "./SecurityTokenToPrincipalMapperShape";
+import { principalToSecurityTokenMapperAnnotation } from "./principalToSecurityTokenMapperAnnotation";
 import { securityTokenToPrincipalMapperAnnotation } from "./securityTokenToPrincipalMapperAnnotation";
 
 export class Module extends _Module<{ container: Container }> {
@@ -28,12 +27,17 @@ function securityTokenToPrincipalFactoryDefinition() {
 		SecurityTokenToPrincipalFactory,
 		References.SECURITY_TOKEN_TO_PRINCIPAL_FACTORY
 	).annotate(
-		onActivation(async function (this: Container, service: SecurityTokenToPrincipalFactory<any>) {
-			const mapperList = await this.resolveByAnnotation<SecurityTokenToPrincipalMapper<any>, unknown>(
+		onActivation(async function (this: Container, service: SecurityTokenToPrincipalFactory) {
+			const mapperList = await this.resolveByAnnotation<unknown, unknown>(
 				securityTokenToPrincipalMapperAnnotation.predicate
 			);
 			for (const [mapper] of mapperList) {
-				service.addMapper(mapper);
+				if (!SecurityTokenToPrincipalMapperShape.isType(mapper)) {
+					throw new Error(
+						"Principal to security token mapper does not implement PrincipalToSecurityTokenMapperShape interface"
+					);
+				}
+				service.addMapper(mapper.toPrincipal.bind(mapper));
 			}
 			return service;
 		})
@@ -46,11 +50,17 @@ function principalToSecurityTokenFactoryDefinition() {
 		References.PRINCIPAL_TO_SECURITY_TOKEN_FACTORY
 	).annotate(
 		onActivation(async function (this: Container, service: PrincipalToSecurityTokenFactory) {
-			const mapperList = await this.resolveByAnnotation<SecurityTokenToPrincipalMapper<any>, unknown>(
-				securityTokenToPrincipalMapperAnnotation.predicate
+			const mapperList = await this.resolveByAnnotation<unknown, unknown>(
+				principalToSecurityTokenMapperAnnotation.predicate
 			);
+
 			for (const [mapper] of mapperList) {
-				service.addMapper(mapper);
+				if (!PrincipalToSecurityTokenMapperShape.isType(mapper)) {
+					throw new Error(
+						"Principal to security token mapper does not implement PrincipalToSecurityTokenMapperShape interface"
+					);
+				}
+				service.addMapper(mapper.toToken.bind(mapper));
 			}
 			return service;
 		})
