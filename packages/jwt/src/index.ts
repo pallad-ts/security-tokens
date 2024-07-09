@@ -3,7 +3,10 @@
  */
 
 export * from "./CachedVerifier";
+export * from "./CommonOptions";
 export * from "./JWT";
-export * from "./JWTHelper";
+export * from "./JWTSigner";
+export * from "./JWTVerifier";
+export * from "./SecretProvider";
 export * from "./TokenJWT";
 export * from "./errors";

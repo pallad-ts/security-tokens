@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-jwt",
-  "version": "3.1.2",
+  "version": "4.0.0",
   "description": "",
   "main": "dist/pallad-security-tokens-jwt.cjs.js",
   "types": "dist/pallad-security-tokens-jwt.cjs.d.ts",
@@ -23,7 +23,8 @@
     "setup-dev": "npx preconstruct dev"
   },
   "peerDependencies": {
-    "@pallad/security-tokens": "*"
+    "@pallad/security-tokens": "*",
+    "@pallad/keyring": "^1.2.0"
   },
   "devDependencies": {
     "@pallad/errors-dev": "^1",
@@ -33,7 +34,6 @@
   "license": "MIT",
   "dependencies": {
     "@pallad/errors": "^1",
-    "@pallad/keyring": "^1.2.0",
     "@pallad/secret": "^1.0.2",
     "@sweet-monads/either": "^3",
     "@types/jsonwebtoken": "^9",

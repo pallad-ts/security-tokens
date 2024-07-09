@@ -1,61 +1,40 @@
 import { CachedVerifier } from "@src/CachedVerifier";
-import { JWTHelper } from "@src/JWTHelper";
+import { JWT } from "@src/JWT";
+import { JWTVerifier } from "@src/JWTVerifier";
 import { errors } from "@src/errors";
 import { Either, fromPromise } from "@sweet-monads/either";
 import { LRUCache } from "lru-cache";
 import { Duration } from "luxon";
 import * as sinon from "sinon";
 
-import { KeyRing } from "@pallad/keyring";
-import { secret } from "@pallad/secret";
 import { SecurityTokenError } from "@pallad/security-tokens";
 
+const VERIFY_OPTIONS = {
+	subject: "any",
+};
+const CURRENT_TIMESTAMP = 60;
+const DURATION = Duration.fromObject({ seconds: 100 });
+
+const TOKEN = "some-random-jwt-token";
 describe("CachedVerifier", () => {
-	let verifier: CachedVerifier;
-	let helper: JWTHelper;
-	let cache: LRUCache<string, Either<any, SecurityTokenError>>;
+	let verifier: CachedVerifier<any>;
+	let rawVerifier: sinon.SinonStubbedInstance<JWTVerifier>;
+	let cache: LRUCache<string, Either<SecurityTokenError, any>>;
 
 	let timer: sinon.SinonFakeTimers;
 
-	const VERIFY_OPTIONS = {
-		subject: "any",
-	};
-	const CURRENT_TIMESTAMP = 60;
-	const DURATION = Duration.fromObject({ seconds: 100 });
-
-	function createVerifier(options?: CachedVerifier.Options<any>["options"]) {
-		return new CachedVerifier({
-			helper: helper as any,
-			cache: cache as any,
+	function createVerifier(options?: Partial<CachedVerifier.Options>) {
+		return new CachedVerifier(rawVerifier, cache, {
 			verifyOptions: VERIFY_OPTIONS,
-			options,
+			...options,
 		});
 	}
 
-	function createData(exp: number) {
-		return {
-			exp,
-			foo: "bar",
-		};
-	}
-
-	function createToken(expiresIn: Duration) {
-		return helper.sign(
-			{ foo: "bar" },
-			{
-				subject: "any",
-				expiresIn,
-			}
-		);
-	}
-
 	beforeEach(() => {
-		const keyRing = new KeyRing().addKey("k1", secret("testPrivateKey"));
+		rawVerifier = sinon.createStubInstance(JWTVerifier);
 
-		helper = new JWTHelper("HS512", keyRing);
 		cache = new LRUCache({
 			max: 10000,
-			ttl: 10000,
 			allowStale: false,
 		});
 
@@ -67,58 +46,72 @@ describe("CachedVerifier", () => {
 		timer.restore();
 	});
 
+	it("success result", async () => {
+		const RESULT: JWT<any> = {
+			header: {
+				alg: "HS256",
+				typ: "JWT",
+			},
+			payload: {
+				exp: CURRENT_TIMESTAMP + DURATION.as("seconds"),
+				sub: "any",
+			},
+			signature: "signature",
+		};
+		rawVerifier.verify.withArgs(TOKEN, VERIFY_OPTIONS).resolves(RESULT);
+		const result = await verifier.verify(TOKEN);
+		expect(result).toBeDefined();
+		sinon.assert.calledOnce(rawVerifier.verify);
+
+		timer.tick(DURATION.as("milliseconds") - 100);
+		const result2 = await verifier.verify(TOKEN);
+		expect(result2).toBeDefined();
+		sinon.assert.calledOnce(rawVerifier.verify);
+	});
+
 	describe("error result", () => {
 		it("by default not cached", async () => {
-			const spy = sinon.spy(helper, "verify");
-			const token = await createToken(Duration.fromObject({ seconds: 100 }));
+			rawVerifier.verify.rejects(errors.EXPIRED.create());
 
-			timer.tick(DURATION.as("milliseconds"));
-
-			const verifyResult1 = await fromPromise(verifier.verify(token));
+			const verifyResult1 = await fromPromise(verifier.verify(TOKEN));
 			expect(verifyResult1.isLeft()).toBe(true);
 			expect(verifyResult1.value).toBeErrorWithCode(errors.EXPIRED);
 
-			const verifyResult2 = await fromPromise(verifier.verify(token));
+			const verifyResult2 = await fromPromise(verifier.verify(TOKEN));
 			expect(verifyResult2.isLeft()).toBe(true);
 			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED);
 
-			sinon.assert.calledTwice(spy);
+			sinon.assert.calledTwice(rawVerifier.verify);
 		});
 
 		it("error cache enabled", async () => {
+			rawVerifier.verify.rejects(errors.EXPIRED.create());
 			const verifier = createVerifier({ cacheError: true });
-			const spy = sinon.spy(helper, "verify");
-			const token = await createToken(Duration.fromObject({ seconds: 100 }));
 
-			timer.tick(DURATION.as("milliseconds"));
-
-			const verifyResult1 = await fromPromise(verifier.verify(token));
+			const verifyResult1 = await fromPromise(verifier.verify(TOKEN));
 			expect(verifyResult1.isLeft()).toBe(true);
 			expect(verifyResult1.value).toBeErrorWithCode(errors.EXPIRED);
 
-			const verifyResult2 = await fromPromise(verifier.verify(token));
+			const verifyResult2 = await fromPromise(verifier.verify(TOKEN));
 			expect(verifyResult2.isLeft()).toBe(true);
 			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED);
 
-			sinon.assert.calledOnce(spy);
+			sinon.assert.calledOnce(rawVerifier.verify);
 		});
 
 		it("error cache disabled", async () => {
+			rawVerifier.verify.rejects(errors.EXPIRED.create());
 			const verifier = createVerifier({ cacheError: false });
-			const spy = sinon.spy(helper, "verify");
-			const token = await createToken(Duration.fromObject({ seconds: 100 }));
 
-			timer.tick(DURATION.as("milliseconds"));
-
-			const verifyResult1 = await fromPromise(verifier.verify(token));
+			const verifyResult1 = await fromPromise(verifier.verify(TOKEN));
 			expect(verifyResult1.isLeft()).toBe(true);
 			expect(verifyResult1.value).toBeErrorWithCode(errors.EXPIRED);
 
-			const verifyResult2 = await fromPromise(verifier.verify(token));
+			const verifyResult2 = await fromPromise(verifier.verify(TOKEN));
 			expect(verifyResult2.isLeft()).toBe(true);
 			expect(verifyResult2.value).toBeErrorWithCode(errors.EXPIRED);
 
-			sinon.assert.calledTwice(spy);
+			sinon.assert.calledTwice(rawVerifier.verify);
 		});
 	});
 });
