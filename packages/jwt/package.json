@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-jwt",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "",
   "main": "dist/pallad-security-tokens-jwt.cjs.js",
   "types": "dist/pallad-security-tokens-jwt.cjs.d.ts",
@@ -23,8 +23,8 @@
     "setup-dev": "npx preconstruct dev"
   },
   "peerDependencies": {
-    "@pallad/security-tokens": "*",
-    "@pallad/keyring": "^1.2.0"
+    "@pallad/keyring": "^1.2.0",
+    "@pallad/security-tokens": "*"
   },
   "devDependencies": {
     "@pallad/errors-dev": "^1",
