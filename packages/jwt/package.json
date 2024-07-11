@@ -1,6 +1,6 @@
 {
   "name": "@pallad/security-tokens-jwt",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "",
   "main": "dist/pallad-security-tokens-jwt.cjs.js",
   "types": "dist/pallad-security-tokens-jwt.cjs.d.ts",
