@@ -12,6 +12,10 @@ export class JWTSigner {
 		this.#options = CommonOptions.computeFromUser(options);
 	}
 
+	get algorithm() {
+		return this.#options.algorithm;
+	}
+
 	async sign<T>(data: T, { keyId, notBefore, expiresIn, ...options }: JWTSigner.SignOptions): Promise<string> {
 		const key = await this.#options.secretProvider(keyId);
 

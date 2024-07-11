@@ -3,7 +3,6 @@ import { promisify } from "util";
 
 import { CommonOptions } from "./CommonOptions";
 import { JWT } from "./JWT";
-import { SecretProvider } from "./SecretProvider";
 import { errors } from "./errors";
 
 export class JWTVerifier {
@@ -11,6 +10,10 @@ export class JWTVerifier {
 
 	constructor(options: CommonOptions.FromUser) {
 		this.#options = CommonOptions.computeFromUser(options);
+	}
+
+	get algorithm() {
+		return this.#options.algorithm;
 	}
 
 	async verify<T extends JwtPayload>(token: string, options: JWTVerifier.VerifyOptions = {}) {
